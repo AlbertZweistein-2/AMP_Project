@@ -1,0 +1,269 @@
+Archive:  project.zip
+  inflating: uut/benchmark.py        
+  inflating: uut/Makefile            
+  inflating: uut/README              
+  inflating: uut/src/library.c       
+  inflating: uut/plots/avg_plot.tex  
+  inflating: uut/report/report.tex   
+  inflating: uut/run_nebula.sh       
+Creating build directory: build
+Compiling src/library.c
+cc -O3 -Wall -Wextra -fopenmp -fPIC -Iinc -c -o build/library.o src/library.c
+Linking library
+cc -O3 -Wall -Wextra -fopenmp -o library build/library.o
+Linking library
+cc -O3 -Wall -Wextra -fopenmp -fPIC -shared -o library.so build/library.o 
+Built library
+Creating data directory: data
+Running small-bench ...
+Thread 0 started.
+LIBRARY: lending 10 books on 1 threads took: 0.000010s
+  with 0 failed turns and 49 successful lends: 4780967.500000 lends/s throughput
+Thread 0 started.
+LIBRARY: lending 10 books on 1 threads took: 0.000003s
+  with 0 failed turns and 49 successful lends: 14386041.000000 lends/s throughput
+Thread 0 started.
+LIBRARY: lending 10 books on 1 threads took: 0.000003s
+  with 0 failed turns and 49 successful lends: 18736948.000000 lends/s throughput
+Thread 0 started.
+Thread 1 started.
+LIBRARY: lending 10 books on 2 threads took: 0.000145s
+  with 22 failed turns and 59 successful lends: 406916.312500 lends/s throughput
+Thread 1 started.
+Thread 0 started.
+LIBRARY: lending 10 books on 2 threads took: 0.000010s
+  with 0 failed turns and 58 successful lends: 5534874.500000 lends/s throughput
+Thread 1 started.
+Thread 0 started.
+LIBRARY: lending 10 books on 2 threads took: 0.000011s
+  with 0 failed turns and 58 successful lends: 5425655.000000 lends/s throughput
+Thread 1 started.
+Thread 0 started.
+Thread 2 started.
+Thread 3 started.
+LIBRARY: lending 10 books on 4 threads took: 0.000251s
+  with 8 failed turns and 78 successful lends: 310530.500000 lends/s throughput
+Thread 1 started.
+Thread 0 started.
+Thread 3 started.
+Thread 2 started.
+LIBRARY: lending 10 books on 4 threads took: 0.000047s
+  with 30 failed turns and 79 successful lends: 1673410.625000 lends/s throughput
+Thread 1 started.
+Thread 0 started.
+Thread 2 started.
+Thread 3 started.
+LIBRARY: lending 10 books on 4 threads took: 0.000063s
+  with 10 failed turns and 79 successful lends: 1246862.375000 lends/s throughput
+Thread 0 started.
+Thread 3 started.
+Thread 4 started.
+Thread 7 started.
+Thread 5 started.
+Thread 2 started.
+Thread 1 started.
+Thread 6 started.
+LIBRARY: lending 10 books on 8 threads took: 0.000464s
+  with 51 failed turns and 119 successful lends: 256613.187500 lends/s throughput
+Thread 4 started.
+Thread 5 started.
+Thread 7 started.
+Thread 0 started.
+Thread 3 started.
+Thread 6 started.
+Thread 2 started.
+Thread 1 started.
+LIBRARY: lending 10 books on 8 threads took: 0.000083s
+  with 102 failed turns and 119 successful lends: 1429137.750000 lends/s throughput
+Thread 6 started.
+Thread 2 started.
+Thread 0 started.
+Thread 3 started.
+Thread 4 started.
+Thread 1 started.
+Thread 7 started.
+Thread 5 started.
+LIBRARY: lending 10 books on 8 threads took: 0.000106s
+  with 71 failed turns and 118 successful lends: 1117329.500000 lends/s throughput
+Thread 12 started.
+Thread 11 started.
+Thread 0 started.
+Thread 14 started.
+Thread 13 started.
+Thread 7 started.
+Thread 2 started.
+Thread 6 started.
+Thread 5 started.
+Thread 3 started.
+Thread 15 started.
+Thread 10 started.
+Thread 1 started.
+Thread 4 started.
+Thread 9 started.
+Thread 8 started.
+LIBRARY: lending 10 books on 16 threads took: 0.002680s
+  with 6885 failed turns and 199 successful lends: 74265.312500 lends/s throughput
+Thread 1 started.
+Thread 7 started.
+Thread 12 started.
+Thread 5 started.
+Thread 14 started.
+Thread 0 started.
+Thread 3 started.
+Thread 2 started.
+Thread 15 started.
+Thread 11 started.
+Thread 9 started.
+Thread 13 started.
+Thread 10 started.
+Thread 8 started.
+Thread 4 started.
+Thread 6 started.
+LIBRARY: lending 10 books on 16 threads took: 0.000907s
+  with 2274 failed turns and 199 successful lends: 219473.328125 lends/s throughput
+Thread 12 started.
+Thread 14 started.
+Thread 6 started.
+Thread 1 started.
+Thread 15 started.
+Thread 7 started.
+Thread 0 started.
+Thread 2 started.
+Thread 4 started.
+Thread 9 started.
+Thread 13 started.
+Thread 5 started.
+Thread 10 started.
+Thread 3 started.
+Thread 11 started.
+Thread 8 started.
+LIBRARY: lending 10 books on 16 threads took: 0.000631s
+  with 1630 failed turns and 199 successful lends: 315269.062500 lends/s throughput
+Thread 0 started.
+LIBRARY: lending 100 books on 1 threads took: 0.000010s
+  with 0 failed turns and 139 successful lends: 14512141.000000 lends/s throughput
+Thread 0 started.
+LIBRARY: lending 100 books on 1 threads took: 0.000006s
+  with 0 failed turns and 139 successful lends: 21882576.000000 lends/s throughput
+Thread 0 started.
+LIBRARY: lenStarting Benchmark run at 2025-11-05T11:44:34
+Starting Benchmark run at 2025-11-05T11:44:34
+ding 100 books on 1 threads took: 0.000006s
+  with 0 failed turns and 139 successful lends: 24424190.000000 lends/s throughput
+Thread 0 started.
+Thread 1 started.
+LIBRARY: lending 100 books on 2 threads took: 0.000071s
+  with 0 failed turns and 239 successful lends: 3373129.250000 lends/s throughput
+Thread 0 started.
+Thread 1 started.
+LIBRARY: lending 100 books on 2 threads took: 0.000037s
+  with 14 failed turns and 238 successful lends: 6367036.500000 lends/s throughput
+Thread 0 started.
+Thread 1 started.
+LIBRARY: lending 100 books on 2 threads took: 0.000031s
+  with 5 failed turns and 238 successful lends: 7645606.000000 lends/s throughput
+Thread 0 started.
+Thread 3 started.
+Thread 2 started.
+Thread 1 started.
+LIBRARY: lending 100 books on 4 threads took: 0.001070s
+  with 170 failed turns and 439 successful lends: 410451.843750 lends/s throughput
+Thread 2 started.
+Thread 3 started.
+Thread 1 started.
+Thread 0 started.
+LIBRARY: lending 100 books on 4 threads took: 0.000223s
+  with 145 failed turns and 439 successful lends: 1971625.000000 lends/s throughput
+Thread 3 started.
+Thread 1 started.
+Thread 2 started.
+Thread 0 started.
+LIBRARY: lending 100 books on 4 threads took: 0.000265s
+  with 12 failed turns and 439 successful lends: 1657422.625000 lends/s throughput
+Thread 5 started.
+Thread 4 started.
+Thread 6 started.
+Thread 1 started.
+Thread 7 started.
+Thread 3 started.
+Thread 2 started.
+Thread 0 started.
+LIBRARY: lending 100 books on 8 threads took: 0.000766s
+  with 225 failed turns and 838 successful lends: 1094193.375000 lends/s throughput
+Thread 7 started.
+Thread 6 started.
+Thread 2 started.
+Thread 0 started.
+Thread 3 started.
+Thread 1 started.
+Thread 4 started.
+Thread 5 started.
+LIBRARY: lending 100 books on 8 threads took: 0.000516s
+  with 439 failed turns and 838 successful lends: 1623335.250000 lends/s throughput
+Thread 4 started.
+Thread 1 started.
+Thread 6 started.
+Thread 3 started.
+Thread 0 started.
+Thread 5 started.
+Thread 7 started.
+Thread 2 started.
+LIBRARY: lending 100 books on 8 threads took: 0.000737s
+  with 2856 failed turns and 839 successful lends: 1138172.000000 lends/s throughput
+Thread 0 started.
+Thread 11 started.
+Thread 12 started.
+Thread 14 started.
+Thread 13 started.
+Thread 5 started.
+Thread 1 started.
+Thread 4 started.
+Thread 2 started.
+Thread 6 started.
+Thread 15 started.
+Thread 10 started.
+Thread 7 started.
+Thread 8 started.
+Thread 9 started.
+Thread 3 started.
+LIBRARY: lending 100 books on 16 threads took: 0.003501s
+  with 6824 failed turns and 1639 successful lends: 468204.656250 lends/s throughput
+Thread 0 started.
+Thread 1 started.
+Thread 13 started.
+Thread 4 started.
+Thread 11 started.
+Thread 2 started.
+Thread 12 started.
+Thread 6 started.
+Thread 5 started.
+Thread 10 started.
+Thread 15 started.
+Thread 8 started.
+Thread 9 started.
+Thread 3 started.
+Thread 7 started.
+Thread 14 started.
+LIBRARY: lending 100 books on 16 threads took: 0.008690s
+  with 14577 failed turns and 1639 successful lends: 188606.515625 lends/s throughput
+Thread 2 started.
+Thread 6 started.
+Thread 12 started.
+Thread 7 started.
+Thread 13 started.
+Thread 3 started.
+Thread 9 started.
+Thread 8 started.
+Thread 5 started.
+Thread 11 started.
+Thread 10 started.
+Thread 1 started.
+Thread 0 started.
+Thread 15 started.
+Thread 4 started.
+Thread 14 started.
+LIBRARY: lending 100 books on 16 threads took: 0.004744s
+  with 8685 failed turns and 1639 successful lends: 345470.406250 lends/s throughput
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+               219 q_student     make amp25w37 CG       0:01      1 nebulac
+done
