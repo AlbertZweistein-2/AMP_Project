@@ -7,3 +7,7 @@ cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 
 mpirun -np 5 ./build/allgather_merge -c
+
+# Docker commands
+docker build -t amp_project:latest -f Dockerfile .
+docker run --rm -it amp_project:latest bash
