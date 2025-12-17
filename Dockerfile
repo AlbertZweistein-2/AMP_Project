@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:latest
 
 # Non-interactive APT
 ENV DEBIAN_FRONTEND=noninteractive
@@ -7,12 +7,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        build-essential \
+       cmake \
        gcc \
        g++ \
        make \
        python3 \
        python3-pip \
-       ca-certificates \
        libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
