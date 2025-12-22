@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "../src/Ex1.h"
+#include <omp.h>
+
+#include "../src/Ex2.h"
 
 // Helper to test initialization and basic operations
 static void test_init_destroy() {
@@ -14,6 +16,9 @@ static void test_init_destroy() {
     assert(q.tail != NULL);
     assert(q.num_threads == 4);
     assert(q.free_lists != NULL);
+    
+    // Test lock initialization
+    assert(omp_test_lock(&q.lock));
     
     destroy_queue(&q);
     
@@ -33,6 +38,8 @@ static void test_fifo_order() {
     // Enqueue values 10, 20, 30
     int ret1 = enq(10, &q, thread_id);
     int ret2 = enq(20, &q, thread_id);
+    assert(omp_test_lock(&q.lock));
+    omp_unset_lock(&q.lock);
     int ret3 = enq(30, &q, thread_id);
     
     assert(ret1 == 1);
@@ -48,6 +55,8 @@ static void test_fifo_order() {
     assert(deq1 == 1 && v1 == 10);
     assert(deq2 == 1 && v2 == 20);
     assert(deq3 == 1 && v3 == 30);
+
+    assert(omp_test_lock(&q.lock));
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -62,9 +71,10 @@ static void test_dequeue_empty() {
     
     value_t v;
     int ret = deq(&v, &q, thread_id);
-    
+      
     // Should return 0 (fail) because only sentinel node exists
     assert(ret == 0);
+    assert(omp_test_lock(&q.lock));
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -126,7 +136,6 @@ static void test_node_recycling() {
     // Second cycle: next enqueue should reuse the freed node
     // If free list works, the node from first dequeue is reused
     enq(112, &q, thread_0_id);
-    
     enq(223, &q, thread_1_id);
 
     assert(q.head->next->data == 112);
@@ -164,10 +173,59 @@ static void test_mixed_operations() {
     printf("  PASS\n");
 }
 
+//Correctness Test: Disjoint Intervals
+static void test_disjoint_intervals() {
+    printf("Test: disjoint_intervals\n");
+    const int num_threads = 4;
+    const int items_per_thread = 1000;
+    //Define array that holds values form 0 to num_threads * items_per_thread -1
+    value_t items[num_threads * items_per_thread];
+    for (int i = 0; i < num_threads * items_per_thread; i++) {
+        items[i] = (value_t)i;
+    }
+    
+    queue_t q;
+    init_queue(&q, num_threads);
+    value_t total_enqueued = 0;
+    value_t total_dequeued = 0;
+
+    #pragma omp parallel num_threads(num_threads)
+    {
+        int thread_id = omp_get_thread_num();
+        value_t* thread_items = calloc(items_per_thread, sizeof(value_t));
+        memcpy(thread_items, &items[thread_id * items_per_thread], items_per_thread * sizeof(value_t));
+        
+        value_t local_enqueued = 0;
+        value_t local_dequeued = 0;
+        
+        // Enqueue disjoint intervals
+        for (int i = 0; i < items_per_thread; i++) {
+            if (enq(thread_items[i], &q, thread_id) == 1){
+                local_enqueued += thread_items[i];
+            }
+        }
+        
+        // Dequeue until empty
+        value_t v;
+        while (deq(&v, &q, thread_id)) {
+            local_dequeued += v;
+        }
+        
+        #pragma omp atomic
+        total_enqueued += local_enqueued;
+        
+        #pragma omp atomic
+        total_dequeued += local_dequeued;
+    }
+
+    assert(total_enqueued == total_dequeued);
+
+}
+
 // Main test runner
 int main(void) {
     printf("========================================\n");
-    printf("Running Ex1 Queue Unit Tests\n");
+    printf("Running Ex2 Concurrent Queue Unit Tests\n");
     printf("========================================\n\n");
     
     test_init_destroy();
@@ -176,6 +234,9 @@ int main(void) {
     test_multi_thread_freelists();
     test_node_recycling();
     test_mixed_operations();
+
+    // Added actual concurent queue test
+    test_disjoint_intervals();
     
     printf("\n========================================\n");
     printf("All tests passed!\n");

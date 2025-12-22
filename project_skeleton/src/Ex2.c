@@ -1,4 +1,4 @@
-#include <Ex1.h>
+#include <Ex2.h>
 
 node_t* make_node(value_t v)
 {
@@ -14,6 +14,7 @@ void init_queue(queue_t* Q, int num_threads)
     Q->tail = Q->head;
     Q->free_lists = calloc(num_threads, sizeof(freelist_t));
     Q->num_threads = num_threads;
+    omp_init_lock(&Q->lock);
     return;
 }
 
@@ -42,16 +43,16 @@ void destroy_queue(queue_t* Q)
         Q->free_lists = NULL;
         Q->num_threads = 0;
     }
-
+    omp_destroy_lock(&Q->lock);
     return;
 }
 
 // pull from local free list -> use in enqueue
-node_t* upcylce_node(queue_t* q, int tid) 
+node_t* upcylce_node(queue_t* Q, int tid) 
 {
-    node_t* n = q->free_lists[tid].head;
+    node_t* n = Q->free_lists[tid].head;
     if (n != NULL) {
-        q->free_lists[tid].head = n->next;
+        Q->free_lists[tid].head = n->next;
         return n;
     }
     return malloc(sizeof(node_t));
@@ -66,18 +67,29 @@ void recycle_node(queue_t* Q, int tid, node_t* node)
 
 int enq(value_t v, queue_t* Q, int thread_id)
 {
+    //Locking to ensure thread safety during enqueue
+    omp_set_lock(&Q->lock);
     node_t* new_node = upcylce_node(Q, thread_id);
-    if(!new_node) return 0;
+    if(!new_node){
+        omp_unset_lock(&Q->lock);
+        return 0;
+    }
     new_node->data = v;
     new_node->next = NULL;
     Q->tail->next = new_node;
     Q->tail = new_node;
+    omp_unset_lock(&Q->lock);
     return 1;
 }
 
 int deq(value_t *v, queue_t* Q, int thread_id)
 {
-    if(!Q->head->next) return 0;
+    // Lock
+    omp_set_lock(&Q->lock);
+    if(!Q->head->next){
+        omp_unset_lock(&Q->lock);
+        return 0;
+    }
     node_t* sentinel = Q->head;
     *v = sentinel->next->data;
     Q->head = sentinel->next;
@@ -85,5 +97,6 @@ int deq(value_t *v, queue_t* Q, int thread_id)
         Q->tail = Q->head;
     }
     recycle_node(Q, thread_id, sentinel);
+    omp_unset_lock(&Q->lock);
     return 1;
 }
