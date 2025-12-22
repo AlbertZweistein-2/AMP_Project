@@ -30,7 +30,7 @@ static void test_fifo_order() {
     int thread_id = 0;
     init_queue(&q, 1);
     
-    // Enqueue values 1, 2, 3
+    // Enqueue values 10, 20, 30
     int ret1 = enq(10, &q, thread_id);
     int ret2 = enq(20, &q, thread_id);
     int ret3 = enq(30, &q, thread_id);
@@ -79,20 +79,26 @@ static void test_multi_thread_freelists() {
     // Thread 0: enqueue/dequeue
     int ret1 = enq(100, &q, 0);
     value_t v1;
+    node_t* ptr_temp = q.head;
     int ret2 = deq(&v1, &q, 0);
     assert(ret1 == 1 && ret2 == 1 && v1 == 100);
+    assert(ptr_temp == q.free_lists[0].head); // Ensure free list was used
     
     // Thread 1: enqueue/dequeue
     int ret3 = enq(200, &q, 1);
+    node_t* ptr_temp3 = q.head;
     value_t v2;
     int ret4 = deq(&v2, &q, 1);
     assert(ret3 == 1 && ret4 == 1 && v2 == 200);
+    assert(ptr_temp3 == q.free_lists[1].head); // Ensure free list was used
     
     // Thread 2: enqueue/dequeue
     int ret5 = enq(300, &q, 2);
+    node_t* ptr_temp4 = q.head;
     value_t v3;
     int ret6 = deq(&v3, &q, 2);
     assert(ret5 == 1 && ret6 == 1 && v3 == 300);
+    assert(ptr_temp4 == q.free_lists[2].head); // Ensure free list was used
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -102,21 +108,31 @@ static void test_multi_thread_freelists() {
 static void test_node_recycling() {
     printf("Test: node_recycling\n");
     queue_t q;
-    int thread_id = 0;
-    init_queue(&q, 1);
+    int thread_0_id = 0;
+    int thread_1_id = 1;
+    init_queue(&q, 2);
     
     // First cycle: enqueue and dequeue to populate free list
-    enq(111, &q, thread_id);
+    enq(111, &q, thread_0_id);
+    node_t* first_ptr = q.head;
     value_t v1;
-    deq(&v1, &q, thread_id);  // This node should go into free_lists[0]
+    deq(&v1, &q, thread_0_id);  // This node should go into free_lists[0]
     
+    enq(222, &q, thread_1_id);
+    node_t* second_ptr = q.head;
+    value_t v2;
+    deq(&v2, &q, thread_1_id);  // This node should go into free_lists[1]
+
     // Second cycle: next enqueue should reuse the freed node
     // If free list works, the node from first dequeue is reused
-    enq(222, &q, thread_id);
-    value_t v2;
-    int ret = deq(&v2, &q, thread_id);
+    enq(112, &q, thread_0_id);
     
-    assert(ret == 1 && v2 == 222);
+    enq(223, &q, thread_1_id);
+
+    assert(q.head->next->data == 112);
+    assert(q.head->next == first_ptr);
+    assert(q.head->next->next->data == 223);
+    assert(q.head->next->next == second_ptr);
     
     destroy_queue(&q);
     printf("  PASS\n");
