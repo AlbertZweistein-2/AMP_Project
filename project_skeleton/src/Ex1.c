@@ -62,6 +62,7 @@ void recycle_node(queue_t* Q, int tid, node_t* node)
 {
     node->next = Q->free_lists[tid].head;
     Q->free_lists[tid].head = node;
+    return;
 }
 
 int enq(value_t v, queue_t* Q, int thread_id)

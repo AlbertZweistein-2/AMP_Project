@@ -16,10 +16,16 @@ target_include_directories(test_ex1_queue PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_test(NAME ex1_queue_test COMMAND test_ex1_queue)
 
-
 # C Concurrent test (from Ex2.c)
 add_executable(test_ex2_concurrent tests/test_ex2_concurrent.c src/Ex2.c)
 target_include_directories(test_ex2_concurrent PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(test_ex2_concurrent PRIVATE OpenMP::OpenMP_C)
 
 add_test(NAME ex2_concurrent_test COMMAND test_ex2_concurrent)
+
+# C Two Locks test (from Ex4.c)
+add_executable(test_ex4_twolocks tests/test_ex4_twolocks.c src/Ex4.c)
+target_include_directories(test_ex4_twolocks PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(test_ex4_twolocks PRIVATE OpenMP::OpenMP_C)
+
+add_test(NAME ex4_twolocks_test COMMAND test_ex4_twolocks)
