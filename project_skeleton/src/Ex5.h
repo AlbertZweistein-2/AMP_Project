@@ -58,6 +58,6 @@ node_t* upcylce_node(queue_t* q, int tid);
 void recycle_node(queue_t* Q, int tid, node_t* node);
 uint16_t getStamp(atomic_stamped_ptr_t addr);
 node_t* getReference(atomic_stamped_ptr_t addr);
-node_t* get(atomic_stamped_ptr_t addr, int stampHolder[]);
+node_t* get(atomic_stamped_ptr_t addr, int* stampHolder);
 int enq(value_t v, queue_t* Q, int thread_id);
 int deq(value_t *v, queue_t* Q, int thread_id);
