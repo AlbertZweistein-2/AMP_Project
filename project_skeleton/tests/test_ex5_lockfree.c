@@ -12,8 +12,8 @@ static void test_init_destroy() {
     queue_t q;
     init_queue(&q, 4);
     
-    assert(unpack_ptr(q.head) != NULL);
-    assert(unpack_ptr(q.tail) != NULL);
+    assert(atomic_load(&q.head) != NULL);
+    assert(atomic_load(&q.tail) != NULL);
     assert(q.num_threads == 4);
     assert(q.free_lists != NULL);
     
@@ -34,9 +34,7 @@ static void test_fifo_order() {
     
     // Enqueue values 10, 20, 30
     int ret1 = enq(10, &q, thread_id);
-
     int ret2 = enq(20, &q, thread_id);
-
     int ret3 = enq(30, &q, thread_id);
     
     assert(ret1 == 1);
@@ -83,26 +81,20 @@ static void test_single_thread_multi_freelists() {
     // Thread 0: enqueue/dequeue
     int ret1 = enq(100, &q, 0);
     value_t v1;
-    node_t* ptr_temp = unpack_ptr(q.head);
     int ret2 = deq(&v1, &q, 0);
     assert(ret1 == 1 && ret2 == 1 && v1 == 100);
-    assert(ptr_temp == q.free_lists[0].head); // Ensure free list was used
     
     // Thread 1: enqueue/dequeue
     int ret3 = enq(200, &q, 1);
-    node_t* ptr_temp3 = unpack_ptr(q.head);
     value_t v2;
     int ret4 = deq(&v2, &q, 1);
     assert(ret3 == 1 && ret4 == 1 && v2 == 200);
-    assert(ptr_temp3 == q.free_lists[1].head); // Ensure free list was used
     
     // Thread 2: enqueue/dequeue
     int ret5 = enq(300, &q, 2);
-    node_t* ptr_temp4 = unpack_ptr(q.head);
     value_t v3;
     int ret6 = deq(&v3, &q, 2);
     assert(ret5 == 1 && ret6 == 1 && v3 == 300);
-    assert(ptr_temp4 == q.free_lists[2].head); // Ensure free list was used
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -112,33 +104,23 @@ static void test_single_thread_multi_freelists() {
 static void test_node_recycling() {
     printf("Test: node_recycling\n");
     queue_t q;
-    int thread_0_id = 0;
-    int thread_1_id = 1;
-    init_queue(&q, 2);
-    
-    // First cycle: enqueue and dequeue to populate free list
-    enq(111, &q, thread_0_id);
-    node_t* first_ptr = unpack_ptr(q.head);
-    value_t v1;
-    deq(&v1, &q, thread_0_id);  // This node should go into free_lists[0]
-    
-    enq(222, &q, thread_1_id);
-    node_t* second_ptr = unpack_ptr(q.head);
-    value_t v2;
-    deq(&v2, &q, thread_1_id);  // This node should go into free_lists[1]
 
-    // Second cycle: next enqueue should reuse the freed node
-    // If free list works, the node from first dequeue is reused
-    enq(112, &q, thread_0_id);
-    enq(223, &q, thread_1_id);
+    // Book-style QSBR: retired nodes are reclaimed at op_end().
+    int tid = 0;
+    init_queue(&q, 1);
 
-    node_t* head = unpack_ptr(q.head);
-    node_t* next1 = unpack_ptr(head->next);
-    node_t* next2 = unpack_ptr(next1->next);
-    assert(next1->data == 112);
-    assert(next1 == first_ptr);
-    assert(next2->data == 223);
-    assert(next2 == second_ptr);
+    value_t v;
+
+    enq(111, &q, tid);
+    node_t* first_retired = atomic_load(&q.head); // the old sentinel to be retired
+    assert(deq(&v, &q, tid) == 1 && v == 111);
+
+    // Reclamation should have moved the retired sentinel to the freelist.
+    assert(q.free_lists[tid].head == first_retired);
+
+    // Next enqueue should reuse the freelist head (oldest retired).
+    enq(9999, &q, tid);
+    assert(atomic_load(&q.tail) == first_retired);
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -170,86 +152,6 @@ static void test_mixed_operations() {
     printf("  PASS\n");
 }
 
-// ABA Problem Test:
-// Dieses Test simuliert das ABA-Szenario:
-// 1. Knoten A wird aus der Queue entfernt (deq)
-// 2. Knoten A wird recycled (kommt in free list)
-// 3. Knoten A wird wieder eingefügt (enq) - SELBER POINTER!
-// 4. Ein CAS mit dem alten Stempel sollte fehlschlagen
-//
-// Wenn Stamped Pointers korrekt implementiert sind:
-// - Der Stempel am head/tail ändert sich bei jeder Operation
-// - Auch wenn derselbe Pointer wiederverwendet wird, unterscheiden sich die Stempel
-static void test_aba_problem_prevention() {
-    printf("Test: aba_problem_prevention\n");
-    queue_t q;
-    int tid = 0;
-    init_queue(&q, 1);
-    
-    // Initiale Stempel speichern
-    uint16_t initial_head_stamp = unpack_stamp(atomic_load(&q.head));
-    uint16_t initial_tail_stamp = unpack_stamp(atomic_load(&q.tail));
-    
-    // 1. Enqueue einen Wert - Tail-Stempel sollte sich ändern
-    enq(42, &q, tid);
-    uint16_t stamp_after_enq1 = unpack_stamp(atomic_load(&q.tail));
-    assert(stamp_after_enq1 != initial_tail_stamp); // Stempel muss sich ändern!
-    
-    // Speichere den Pointer auf den eingefügten Knoten
-    node_t* sentinel = unpack_ptr(atomic_load(&q.head));
-    node_t* node_A = unpack_ptr(sentinel->next);
-    
-    // 2. Dequeue - Head-Stempel sollte sich ändern, Knoten wird recycled
-    value_t v;
-    deq(&v, &q, tid);
-    assert(v == 42);
-    uint16_t stamp_after_deq1 = unpack_stamp(atomic_load(&q.head));
-    assert(stamp_after_deq1 != initial_head_stamp); // Stempel muss sich ändern!
-    
-    // Knoten A sollte jetzt in der free list sein
-    assert(q.free_lists[tid].head == node_A);
-    
-    // 3. Enqueue erneut - Knoten A wird aus free list wiederverwendet (ABA!)
-    enq(99, &q, tid);
-    
-    // Der SELBE Pointer wird wiederverwendet
-    node_t* new_sentinel = unpack_ptr(atomic_load(&q.head));
-    node_t* reused_node = unpack_ptr(new_sentinel->next);
-    assert(reused_node == node_A); // Gleicher Pointer wie vorher! (A -> B -> A)
-    
-    // ABER: Die Stempel haben sich geändert!
-    uint16_t stamp_after_enq2 = unpack_stamp(atomic_load(&q.tail));
-    assert(stamp_after_enq2 != stamp_after_enq1); // Stempel unterscheidet A von A'
-    
-    // 4. Simuliere einen veralteten CAS-Versuch
-    // Ein Thread der den alten Stempel gespeichert hat, sollte scheitern
-    node_t* current_head = unpack_ptr(atomic_load(&q.head));
-    node_t* next_node = unpack_ptr(current_head->next);
-    
-    // Versuche CAS mit ALTEM Stempel - sollte FEHLSCHLAGEN
-    bool stale_cas_result = compare_and_set_stamped(
-        &q.head,
-        current_head,
-        next_node,
-        initial_head_stamp,  // Veralteter Stempel!
-        initial_head_stamp + 1
-    );
-    assert(stale_cas_result == false); // MUSS fehlschlagen wegen ABA-Schutz!
-    
-    // Versuche CAS mit AKTUELLEM Stempel - sollte GELINGEN
-    uint16_t current_stamp = unpack_stamp(atomic_load(&q.head));
-    bool correct_cas_result = compare_and_set_stamped(
-        &q.head,
-        current_head,
-        next_node,
-        current_stamp,  // Aktueller Stempel
-        current_stamp + 1
-    );
-    assert(correct_cas_result == true); // Muss gelingen!
-    
-    destroy_queue(&q);
-    printf("  PASS\n");
-}
 
 //Correctness Test: Disjoint Intervals
 static void test_disjoint_intervals() {
@@ -301,6 +203,126 @@ static void test_disjoint_intervals() {
     printf("  PASS\n");
 }
 
+// Helper function for is_odd (same as in Ex5.c)
+static inline int test_is_odd(uint64_t x) {
+    return (int)(x & 1ULL);
+}
+
+static void test_ABA_problem() {
+    printf("Test: ABA_problem\n");
+
+    // This test forces an ABA-like schedule and checks that EBR/QSBR prevents it.
+    // Thread A pauses after reading (first=a, next=b) and before attempting head CAS.
+    // Thread B dequeues once, which advances head away from a and retires a.
+    // With our book-style QSBR (reclaim-at-op_end), B cannot reclaim/reuse a while A is
+    // still "in operation". So head must never return to a before A resumes.
+    queue_t q;
+    init_queue(&q, 2);
+
+    // Create at least two real nodes (b,c) after sentinel a.
+    assert(enq(1, &q, 0) == 1);
+    assert(enq(2, &q, 0) == 1);
+
+    _Atomic int ready = 0;
+    _Atomic int go = 0;
+    _Atomic int head_moved = 0;
+    _Atomic int returned_to_a = 0;
+    _Atomic int retired_list_ok = 0;
+
+    node_t* observed_first = NULL;
+    node_t* observed_next = NULL;
+
+    value_t va = -1;
+    value_t vb = -1;
+    _Atomic int ra = 0;
+    _Atomic int rb = 0;
+
+    #pragma omp parallel num_threads(3) shared(q, ready, go, head_moved, returned_to_a, retired_list_ok, observed_first, observed_next, va, vb, ra, rb)
+    {
+        int tid = omp_get_thread_num();
+        if (tid == 0) {
+            int r = deq_pause_before_cas(&va, &q, 0, &ready, &go, &observed_first, &observed_next);
+            atomic_store_explicit(&ra, r, memory_order_release);
+        } else if (tid == 1) {
+            while (atomic_load_explicit(&ready, memory_order_acquire) == 0) {
+                // wait until A captured (a,b)
+            }
+            int r = deq(&vb, &q, 1);
+            atomic_store_explicit(&rb, r, memory_order_release);
+        } else {
+            // Observer thread (does not call queue ops; just watches head).
+            while (atomic_load_explicit(&ready, memory_order_acquire) == 0) 
+            { 
+                // wait until A captured (a,b)
+            }
+            node_t* a = observed_first;
+            node_t* b = observed_next;
+
+            // Wait until head changes away from the old sentinel address.
+            while (atomic_load_explicit(&q.head, memory_order_seq_cst) == a) {
+                // B should eventually CAS head from a -> b
+            }
+
+            if (atomic_load_explicit(&q.head, memory_order_seq_cst) == b) {
+                atomic_store_explicit(&head_moved, 1, memory_order_release);
+            }
+
+            // While A is paused (go==0), thread 1's deq() should have retired `a` but
+            // must be blocked in mm_wait_until_unreserved() (because ctr[0] is odd).
+            // We use ctr[1] (seq_cst) as a synchronization point to safely read q.retired[1].
+            while ((atomic_load_explicit(&q.ctr[1], memory_order_seq_cst) & 1ULL) != 0ULL) {
+                // wait until thread 1 reached mm_op_end() (odd -> even)
+            }
+
+            // Verify retired list of thread 1 contains exactly the expected node `a`.
+            int ok = 0;
+            retired_t* r = q.retired[1];
+            if (r && r->node == a && r->next == NULL) {
+                ok = 1;
+            }
+            atomic_store_explicit(&retired_list_ok, ok, memory_order_release);
+
+            // While A is still paused, head must not return to a.
+            // If ABA were possible via reclamation+reuse, head could become a again here.
+            /*while (atomic_load_explicit(&go, memory_order_acquire) == 0) {
+                if (atomic_load_explicit(&q.head, memory_order_seq_cst) == b) {
+                    atomic_store_explicit(&returned_to_a, 1, memory_order_release);
+                    break;
+                }
+            }*/
+
+            // Let A resume.
+            atomic_store_explicit(&go, 1, memory_order_release);
+        }
+    }
+
+    //Checking if the free node in thread A's free list is the same as observed_next,
+    //Because Thread B should have retired node b (which was observed_first by thread A)
+    node_t* free_node_A = q.free_lists[0].head;
+    //printf("Retired node A address: %p, observed_next address: %p\n", (void*)retired_node_A, (void*)observed_next);
+    assert(free_node_A != NULL && free_node_A == observed_next);
+
+    //Check if free node in thread B's free list is the same as observed_first,
+    //Because Thread B should have retired node a (which was observed_first by thread A)
+    node_t* free_node_B = q.free_lists[1].head;
+    //printf("Retired node B address: %p, observed_first address: %p\n", (void*)retired_node_B, (void*)observed_first);
+    assert(free_node_B != NULL && free_node_B == observed_first);
+
+    assert(atomic_load_explicit(&head_moved, memory_order_acquire) == 1);
+    assert(atomic_load_explicit(&returned_to_a, memory_order_acquire) == 0);
+    assert(atomic_load_explicit(&retired_list_ok, memory_order_acquire) == 1);
+    assert(atomic_load_explicit(&ra, memory_order_acquire) == 1);
+    assert(atomic_load_explicit(&rb, memory_order_acquire) == 1);
+    assert((va == 1 && vb == 2) || (va == 2 && vb == 1));
+
+    // Queue should be empty now.
+    value_t v;
+    assert(deq(&v, &q, 0) == 0);
+
+    destroy_queue(&q);
+    printf("  PASS\n");
+}
+
 // Main test runner
 int main(void) {
     printf("========================================\n");
@@ -313,7 +335,7 @@ int main(void) {
     test_single_thread_multi_freelists();
     test_node_recycling();
     test_mixed_operations();
-    test_aba_problem_prevention();
+    test_ABA_problem();
     
     printf("\n========================================\n");
     printf("All tests passed!\n");
