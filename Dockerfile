@@ -11,6 +11,7 @@ RUN apt-get update \
        gcc \
        g++ \
        make \
+       gdb \
        python3 \
        python3-pip \
        libgomp1 \

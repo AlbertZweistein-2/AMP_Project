@@ -29,3 +29,10 @@ target_include_directories(test_ex4_twolocks PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(test_ex4_twolocks PRIVATE OpenMP::OpenMP_C)
 
 add_test(NAME ex4_twolocks_test COMMAND test_ex4_twolocks)
+
+# C Lock Free test (from Ex5.c)
+add_executable(test_ex5_lockfree tests/test_ex5_lockfree.c src/Ex5.c)
+target_include_directories(test_ex5_lockfree PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(test_ex5_lockfree PRIVATE OpenMP::OpenMP_C)
+
+add_test(NAME ex5_lockfree_test COMMAND test_ex5_lockfree)
