@@ -97,8 +97,7 @@ void run_benchmark(int num_threads, int num_repetitions, int time_interval,
                 // Thread 1 enqueues: 1, 5, 9, 13, ...
                 // Thread 2 enqueues: 2, 6, 10, 14, ...
                 // Thread 3 enqueues: 3, 7, 11, 15, ...
-                enq(value, &queue, tid);
-                enq_count++;
+                enq_count += enq(value, &queue, tid);
             }
 
             // Dequeue batch
