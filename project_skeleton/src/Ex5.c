@@ -235,7 +235,7 @@ int deq(value_t *v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_
                     mm_op_end(Q, thread_id, free_list_insertion_count);
                     return 0;
                 }
-                if(!atomic_compare_exchange_weak(&Q->tail, &last, next)){
+                if(!atomic_compare_exchange_weak(&Q->tail, &last, next)) {
                     if(failed_CAS_count) (*failed_CAS_count)++;
                 } //Helping out the enqueuers
             } else {
