@@ -156,6 +156,13 @@ void run_benchmark(int num_threads, int time_interval,
                 expected_sum += i * num_threads + tid;
             }
         }
+        node_t* curr = atomic_load(&queue.head);
+        while (curr != NULL)
+        {
+            value_t value = curr->value;
+            expected_sum -= value;
+            curr = atomic_load(&curr->next);
+        }
         if (total_dequeue_sum != expected_sum)
         {
             printf("Correctness check failed: expected sum %u, got %u\n", expected_sum, total_dequeue_sum);
