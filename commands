@@ -17,7 +17,7 @@ cd project_skeleton
 docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace && mkdir -p build-cmake && cd build-cmake && cmake .. && cmake --build ."
 
 #TODO LIST:
-# check Ex4 sum differences in benchmark with concurrent queues
+# check Ex4 sum differences in benchmark with concurrent queues -> Should be fixed now -> Test!
 # add free_list_insertions tracking to benchmark -> Done for Ex5
 # Test mem leaks
 
