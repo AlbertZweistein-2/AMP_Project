@@ -35,15 +35,16 @@
 
 #include "../src/bench.h"
 
-void run_benchmark(int num_threads, int num_repetitions, int time_interval,
+void run_benchmark(int num_threads, int time_interval,
                    batch_spec_t* enq_specs, batch_spec_t* deq_specs,
-                   int* Nr_enq_operations, int* Nr_deq_operations,
-                   int* Nr_failed_deq_operations, int* Nr_failed_CAS_operations,
-                   int* Nr_free_list_insertions, int* Max_free_list_size)
+                   int Nr_enq_operations[], int Nr_deq_operations[],
+                   int Nr_failed_enq_operations[],int Nr_failed_deq_operations[],
+                   int Nr_failed_enq_CAS_operations[], int Nr_failed_deq_CAS_operations[],
+                   int Nr_free_list_insertions[], int Max_free_list_size[])
 {
     queue_t queue;
     init_queue(&queue, num_threads);
-    #if DEBUG
+    #if DEBUG && VERSION == 5
         printf("Queue initialized.\n");
         assert(atomic_load(&queue.head) != NULL);
         assert(atomic_load(&queue.tail) != NULL);
@@ -51,22 +52,17 @@ void run_benchmark(int num_threads, int num_repetitions, int time_interval,
         assert(queue.free_lists != NULL);
         assert(atomic_load(&queue.head) == atomic_load(&queue.tail));
         printf("Queue head and tail point to the same dummy node.\n");
+    #elif DEBUG
+        printf("Queue initialized.\n");
+        assert(queue.head != NULL);
+        assert(queue.tail != NULL);
+        assert(queue.num_threads == num_threads);
+        assert(queue.head == queue.tail);
+        printf("Queue head and tail point to the same dummy node.\n");
     #endif
 
-    #if CHECK
-        printf("Including correctness checks in the benchmark.\n");
-        const int elements_per_thread = 100000;
-        // Initialize an array that holds the values to be enqueued by each thread
-        // to track correctness in the end.
-        int** thread_values = (int**)malloc(num_threads * sizeof(int*));
-        for (int i = 0; i < num_threads; i++)
-        {
-            thread_values[i] = (int*)malloc(elements_per_thread * sizeof(int));
-            for (int j = 0; j < elements_per_thread; j++)
-            {
-                thread_values[i][j] = i * elements_per_thread + j;
-            }
-        }
+    #if CHECK_CORRECTNESS
+        unsigned int total_dequeue_sum = 0;
     #endif
 
     #pragma omp parallel num_threads(num_threads)
@@ -75,11 +71,15 @@ void run_benchmark(int num_threads, int num_repetitions, int time_interval,
         unsigned int seed = (unsigned int)(time(NULL) ^ (tid * 0x9e3779b9u));
         int enq_count = 0;
         int deq_count = 0;
-        int deq_sum = 0;
+        int failed_enq_count = 0;
         int failed_deq_count = 0;
-        int failed_CAS_count = 0;
+        int failed_enq_CAS_count = 0;
+        int failed_deq_CAS_count = 0;
         int free_list_insertions = 0;
         int max_free_list_size = 0;
+        #if CHECK_CORRECTNESS
+            value_t dequeue_sum = 0;
+        #endif
 
         // Each thread runs the benchmark for the specified time interval
         time_t end_time = time(NULL) + time_interval;
@@ -87,36 +87,122 @@ void run_benchmark(int num_threads, int num_repetitions, int time_interval,
         {
             int enq_batch_size = batch_spec_sample(&enq_specs[tid], &seed);
             int deq_batch_size = batch_spec_sample(&deq_specs[tid], &seed);
+            int success;
 
             // Enqueue batch
-            for (int i = 0; i < enq_batch_size; i++)
+            for (int i = 0; i < enq_batch_size; )
             {
-                int value = enq_count * num_threads + tid; // Example value to enqueue
+                success = 0;
+                value_t value = enq_count * num_threads + tid; // Example value to enqueue
                 // Example: num_threads = 4
-                // Thread 0 enqueues: 0, 4, 8, 12, ...
-                // Thread 1 enqueues: 1, 5, 9, 13, ...
+                // Thread 0 enqueues: 0, 4,  8, 12, ...
+                // Thread 1 enqueues: 1, 5,  9, 13, ...
                 // Thread 2 enqueues: 2, 6, 10, 14, ...
                 // Thread 3 enqueues: 3, 7, 11, 15, ...
-                enq_count += enq(value, &queue, tid);
+                #if VERSION == 5
+                    success += enq(value, &queue, tid, &failed_enq_CAS_count, &free_list_insertions);
+                #else
+                    success += enq(value, &queue, tid);
+                #endif
+                max_free_list_size = queue.free_lists[tid].size > max_free_list_size ? queue.free_lists[tid].size : max_free_list_size;
+                enq_count += success;
+                failed_enq_count += (1 - success);
+                i += success;
             }
 
             // Dequeue batch
             for (int i = 0; i < deq_batch_size; i++)
             {
+                success = 0;
+                value_t value;
+                #if VERSION == 5
+                    success = deq(&value, &queue, tid, &failed_deq_CAS_count, &free_list_insertions);
+                    //Check free list size
+                #else
+                    success = deq(&value, &queue, tid);
+                #endif
+                max_free_list_size = queue.free_lists[tid].size > max_free_list_size ? queue.free_lists[tid].size : max_free_list_size;
+                deq_count += success;
+                failed_deq_count += (1 - success);
+                #if CHECK_CORRECTNESS
+                    dequeue_sum += value * success;
+                #endif
             }
         }
 
         // Store thread-local counters into the provided arrays
         Nr_enq_operations[tid] = enq_count;
         Nr_deq_operations[tid] = deq_count;
+        Nr_failed_enq_operations[tid] = failed_enq_count;
         Nr_failed_deq_operations[tid] = failed_deq_count;
-        Nr_failed_CAS_operations[tid] = failed_CAS_count;
+        Nr_failed_enq_CAS_operations[tid] = failed_enq_CAS_count;
+        Nr_failed_deq_CAS_operations[tid] = failed_deq_CAS_count;
         Nr_free_list_insertions[tid] = free_list_insertions;
         Max_free_list_size[tid] = max_free_list_size;
+
+        #if CHECK_CORRECTNESS
+            #pragma omp atomic
+            total_dequeue_sum += dequeue_sum;
+        #endif
     }
 
+    #if CHECK_CORRECTNESS
+        unsigned int expected_sum = 0;
+        for (int tid = 0; tid < num_threads; tid++)
+        {
+            int enq_count = Nr_enq_operations[tid];
+            for (int i = 0; i < enq_count; i++)
+            {
+                expected_sum += i * num_threads + tid;
+            }
+        }
+        if (total_dequeue_sum != expected_sum)
+        {
+            printf("Correctness check failed: expected sum %u, got %u\n", expected_sum, total_dequeue_sum);
+        }
+        else
+        {
+            printf("Correctness check passed: total dequeue sum matches expected sum %u\n", expected_sum);
+        }
+    #endif
+}
 
+void write_results_line(int rep, int num_threads, int time_interval,
+                        int* Nr_enq_operations, int* Nr_deq_operations,
+                        int* Nr_failed_enq_operations, int* Nr_failed_deq_operations,
+                        int* Nr_failed_enq_CAS_operations, int* Nr_failed_deq_CAS_operations,
+                        int* Nr_free_list_insertions, int* Max_free_list_size, char* filename)
+{
+    FILE *f = fopen(filename, "a");
+    if (f == NULL)
+    {
+        perror("Error opening file for writing results");
+        return;
+    }
 
+    // Write header if first repetition
+    if (rep == 0)
+    {
+        fprintf(f, "Repetition,NumThreads,TimeInterval,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize\n");
+    }
+
+    for (int tid = 0; tid < num_threads; tid++)
+    {
+        fprintf(f, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
+                rep + 1,
+                num_threads,
+                time_interval,
+                tid,
+                Nr_enq_operations[tid],
+                Nr_deq_operations[tid],
+                Nr_failed_enq_operations[tid],
+                Nr_failed_deq_operations[tid],
+                Nr_failed_enq_CAS_operations[tid],
+                Nr_failed_deq_CAS_operations[tid],
+                Nr_free_list_insertions[tid],
+                Max_free_list_size[tid]);
+    }
+    fclose(f);
 }
 
 int main(int argc, char* argv[])
@@ -127,6 +213,7 @@ int main(int argc, char* argv[])
     // argv[3]: Time interval for throughput measurement
     // argv[4]: Enqueue batch size (per thread or according to some pattern)
     // argv[5]: Dequeue batch size (per thread or according to some pattern)
+    // argv[6]: (optional) Output filename
     // -----------------------------------------
     // -------- Possible Batch Size Patterns --------
     // Batch size specification forms (passed as strings via argv[4]/argv[5]; whitespace is ignored inside tuples/lists):
@@ -159,15 +246,19 @@ int main(int argc, char* argv[])
     int time_interval = 0;
     batch_spec_t* enq_specs = NULL;
     batch_spec_t* deq_specs = NULL;
+    char* filename;
 
-    parse_args(argc, argv, &num_threads, &num_repetitions, &time_interval, &enq_specs, &deq_specs);
+    parse_args(argc, argv, &num_threads, &num_repetitions, &time_interval, &enq_specs, &deq_specs, &filename);
     #if DEBUG
         print_configuration(num_threads, num_repetitions, time_interval, enq_specs, deq_specs);
     #endif
-    // TODO: run benchmark using enq_specs/deq_specs.
-    // Example for one thread tid:
-    //   unsigned int seed = (unsigned int)(time(NULL) ^ (tid * 0x9e3779b9u));
-    //   int batch = batch_spec_sample(&enq_specs[tid], &seed);
+    #if VERSION == 1
+        if (num_threads != 1)
+        {
+            printf("Warning: Version 1 only supports a single thread. Overriding num_threads to 1.\n");
+            num_threads = 1;
+        }
+    #endif
     
     // Global Counters:
     // - Number of enqueue operations performed
@@ -179,16 +270,34 @@ int main(int argc, char* argv[])
 
     // Use thread-local counters and aggregate at the end of the run!
     // Use Arrays to store the thread-local counters.
-    int Nr_enq_operations[num_threads];
-    int Nr_deq_operations[num_threads];
-    int Nr_failed_deq_operations[num_threads];
-    int Nr_failed_CAS_operations[num_threads];
-    int Nr_free_list_insertions[num_threads];
-    int Max_free_list_size[num_threads];
     
-    run_benchmark(num_threads, num_repetitions, time_interval, enq_specs, deq_specs,
-                  &Nr_enq_operations, &Nr_deq_operations, &Nr_failed_deq_operations,
-                  &Nr_failed_CAS_operations, &Nr_free_list_insertions, &Max_free_list_size);
+    for(int rep = 0; rep < num_repetitions; rep++) 
+    {
+        printf("Running benchmark repetition %d/%d...\n", rep + 1, num_repetitions);
+        int Nr_enq_operations[num_threads];
+        int Nr_deq_operations[num_threads];
+        int Nr_failed_enq_operations[num_threads];
+        int Nr_failed_deq_operations[num_threads];
+        int Nr_failed_enq_CAS_operations[num_threads];
+        int Nr_failed_deq_CAS_operations[num_threads];
+        int Nr_free_list_insertions[num_threads];
+        int Max_free_list_size[num_threads];
+        
+        run_benchmark(num_threads, time_interval, enq_specs, deq_specs,
+                    Nr_enq_operations, Nr_deq_operations, 
+                    Nr_failed_enq_operations, Nr_failed_deq_operations,
+                    Nr_failed_enq_CAS_operations, Nr_failed_deq_CAS_operations, 
+                    Nr_free_list_insertions, Max_free_list_size);
+        //create a results line, that will later be written to a file
+        write_results_line(rep, num_threads, time_interval,
+                           Nr_enq_operations, Nr_deq_operations,
+                           Nr_failed_enq_operations, Nr_failed_deq_operations,
+                           Nr_failed_enq_CAS_operations, Nr_failed_deq_CAS_operations,
+                           Nr_free_list_insertions, Max_free_list_size, filename);
+    }
+
+    // Print results and free memory
+    printf("Benchmark completed. Results written to %s\n", filename);
 
     free(enq_specs);
     free(deq_specs);

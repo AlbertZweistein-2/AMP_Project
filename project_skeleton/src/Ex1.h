@@ -9,6 +9,7 @@ typedef struct node {
 
 typedef struct freelist {
     node_t* head;
+    int size;
 } freelist_t;
 
 typedef struct queue {
@@ -21,6 +22,6 @@ typedef struct queue {
 node_t* make_node(value_t v);
 void init_queue(queue_t* Q, int num_threads);
 void destroy_queue(queue_t* Q);
-node_t* upcylce_node(queue_t* q, int tid);
+node_t* upcylce_node(queue_t* Q, int tid);
 int enq(value_t v, queue_t* Q, int thread_id);
 int deq(value_t* v, queue_t* Q, int thread_id);

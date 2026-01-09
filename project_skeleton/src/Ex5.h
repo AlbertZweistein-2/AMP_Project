@@ -16,6 +16,7 @@ typedef struct node {
 
 typedef struct freelist {
     node_t* head;
+    int size;
 } freelist_t;
 
 typedef struct retired {
@@ -40,10 +41,10 @@ node_t* make_node(value_t v);
 node_t* get_next(node_t* n);
 void init_queue(queue_t* Q, int num_threads);
 void destroy_queue(queue_t* Q);
-node_t* upcylce_node(queue_t* q, int tid);
-void recycle_node(queue_t* Q, int tid, node_t* node);
-int enq(value_t v, queue_t* Q, int thread_id);
-int deq(value_t *v, queue_t* Q, int thread_id);
+node_t* upcylce_node(queue_t* Q, int tid);
+void recycle_node(queue_t* Q, int tid, node_t* node, int* free_list_insertion_count);
+int enq(value_t v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_list_insertion_count);
+int deq(value_t *v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_list_insertion_count);
 
 // Test helper: pauses just before attempting the head CAS in the dequeue fast-path.
 // Used to force ABA-style interleavings in unit tests.

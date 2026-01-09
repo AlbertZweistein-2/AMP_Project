@@ -12,6 +12,7 @@ typedef struct node {
 
 typedef struct freelist {
     node_t* head;
+    int size;
 } freelist_t;
 
 typedef struct peterson_lock {
@@ -34,7 +35,7 @@ void init_queue(queue_t* Q, int num_threads);
 void destroy_queue(queue_t* Q);
 void lock_peterson(peterson_lock_t* plock, uint8_t flag_id);
 void unlock_peterson(peterson_lock_t* plock, uint8_t flag_id);
-node_t* upcylce_node(queue_t* q, int tid);
+node_t* upcylce_node(queue_t* Q, int tid);
 void recycle_node(queue_t* Q, int tid, node_t* node);
 int enq(value_t v, queue_t* Q, int thread_id);
 int deq(value_t *v, queue_t* Q, int thread_id);

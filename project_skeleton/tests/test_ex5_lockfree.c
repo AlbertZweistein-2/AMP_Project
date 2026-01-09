@@ -33,9 +33,9 @@ static void test_fifo_order() {
     init_queue(&q, 1);
     
     // Enqueue values 10, 20, 30
-    int ret1 = enq(10, &q, thread_id);
-    int ret2 = enq(20, &q, thread_id);
-    int ret3 = enq(30, &q, thread_id);
+    int ret1 = enq(10, &q, thread_id, NULL, NULL);
+    int ret2 = enq(20, &q, thread_id, NULL, NULL);
+    int ret3 = enq(30, &q, thread_id, NULL, NULL);
     
     assert(ret1 == 1);
     assert(ret2 == 1);
@@ -43,9 +43,9 @@ static void test_fifo_order() {
     
     // Dequeue and verify FIFO order
     value_t v1, v2, v3;
-    int deq1 = deq(&v1, &q, thread_id);
-    int deq2 = deq(&v2, &q, thread_id);
-    int deq3 = deq(&v3, &q, thread_id);
+    int deq1 = deq(&v1, &q, thread_id, NULL, NULL);
+    int deq2 = deq(&v2, &q, thread_id, NULL, NULL);
+    int deq3 = deq(&v3, &q, thread_id, NULL, NULL);
     
     assert(deq1 == 1 && v1 == 10);
     assert(deq2 == 1 && v2 == 20);
@@ -63,7 +63,7 @@ static void test_dequeue_empty() {
     init_queue(&q, 1);
     
     value_t v;
-    int ret = deq(&v, &q, thread_id);
+    int ret = deq(&v, &q, thread_id, NULL, NULL);
       
     // Should return 0 (fail) because only sentinel node exists
     assert(ret == 0);
@@ -79,21 +79,21 @@ static void test_single_thread_multi_freelists() {
     init_queue(&q, 4);
     
     // Thread 0: enqueue/dequeue
-    int ret1 = enq(100, &q, 0);
+    int ret1 = enq(100, &q, 0, NULL, NULL);
     value_t v1;
-    int ret2 = deq(&v1, &q, 0);
+    int ret2 = deq(&v1, &q, 0, NULL, NULL);
     assert(ret1 == 1 && ret2 == 1 && v1 == 100);
     
     // Thread 1: enqueue/dequeue
-    int ret3 = enq(200, &q, 1);
+    int ret3 = enq(200, &q, 1, NULL, NULL);
     value_t v2;
-    int ret4 = deq(&v2, &q, 1);
+    int ret4 = deq(&v2, &q, 1, NULL, NULL);
     assert(ret3 == 1 && ret4 == 1 && v2 == 200);
     
     // Thread 2: enqueue/dequeue
-    int ret5 = enq(300, &q, 2);
+    int ret5 = enq(300, &q, 2, NULL, NULL);
     value_t v3;
-    int ret6 = deq(&v3, &q, 2);
+    int ret6 = deq(&v3, &q, 2, NULL, NULL);
     assert(ret5 == 1 && ret6 == 1 && v3 == 300);
     
     destroy_queue(&q);
@@ -111,15 +111,15 @@ static void test_node_recycling() {
 
     value_t v;
 
-    enq(111, &q, tid);
+    enq(111, &q, tid, NULL, NULL);
     node_t* first_retired = atomic_load(&q.head); // the old sentinel to be retired
-    assert(deq(&v, &q, tid) == 1 && v == 111);
+    assert(deq(&v, &q, tid, NULL, NULL) == 1 && v == 111);
 
     // Reclamation should have moved the retired sentinel to the freelist.
     assert(q.free_lists[tid].head == first_retired);
 
     // Next enqueue should reuse the freelist head (oldest retired).
-    enq(9999, &q, tid);
+    enq(9999, &q, tid, NULL, NULL);
     assert(atomic_load(&q.tail) == first_retired);
     
     destroy_queue(&q);
@@ -134,19 +134,19 @@ static void test_mixed_operations() {
     init_queue(&q, 1);
     
     // Enqueue 1, enqueue 2, dequeue (should be 1), enqueue 3, dequeue (should be 2)
-    enq(1, &q, thread_id);
-    enq(2, &q, thread_id);
+    enq(1, &q, thread_id, NULL, NULL);
+    enq(2, &q, thread_id, NULL, NULL);
     
     value_t v1;
-    assert(deq(&v1, &q, thread_id) == 1 && v1 == 1);
+    assert(deq(&v1, &q, thread_id, NULL, NULL) == 1 && v1 == 1);
     
-    enq(3, &q, thread_id);
+    enq(3, &q, thread_id, NULL, NULL);
     
     value_t v2;
-    assert(deq(&v2, &q, thread_id) == 1 && v2 == 2);
+    assert(deq(&v2, &q, thread_id, NULL, NULL) == 1 && v2 == 2);
     
     value_t v3;
-    assert(deq(&v3, &q, thread_id) == 1 && v3 == 3);
+    assert(deq(&v3, &q, thread_id, NULL, NULL) == 1 && v3 == 3);
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -180,14 +180,14 @@ static void test_disjoint_intervals() {
         
         // Enqueue disjoint intervals
         for (int i = 0; i < items_per_thread; i++) {
-            if (enq(thread_items[i], &q, thread_id) == 1){
+            if (enq(thread_items[i], &q, thread_id, NULL, NULL) == 1){
                 local_enqueued += thread_items[i];
             }
         }
         
         // Dequeue until empty
         value_t v;
-        while (deq(&v, &q, thread_id)) {
+        while (deq(&v, &q, thread_id, NULL, NULL)) {
             local_dequeued += v;
         }
         
@@ -220,8 +220,8 @@ static void test_ABA_problem() {
     init_queue(&q, 2);
 
     // Create at least two real nodes (b,c) after sentinel a.
-    assert(enq(1, &q, 0) == 1);
-    assert(enq(2, &q, 0) == 1);
+    assert(enq(1, &q, 0, NULL, NULL) == 1);
+    assert(enq(2, &q, 0, NULL, NULL) == 1);
 
     _Atomic int ready = 0;
     _Atomic int go = 0;
@@ -247,7 +247,7 @@ static void test_ABA_problem() {
             while (atomic_load_explicit(&ready, memory_order_acquire) == 0) {
                 // wait until A captured (a,b)
             }
-            int r = deq(&vb, &q, 1);
+            int r = deq(&vb, &q, 1, NULL, NULL);
             atomic_store_explicit(&rb, r, memory_order_release);
         } else {
             // Observer thread (does not call queue ops; just watches head).
@@ -317,7 +317,7 @@ static void test_ABA_problem() {
 
     // Queue should be empty now.
     value_t v;
-    assert(deq(&v, &q, 0) == 0);
+    assert(deq(&v, &q, 0, NULL, NULL) == 0);
 
     destroy_queue(&q);
     printf("  PASS\n");

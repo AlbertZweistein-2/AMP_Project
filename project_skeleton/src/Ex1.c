@@ -13,6 +13,10 @@ void init_queue(queue_t* Q, int num_threads)
     Q->head = make_node(0);
     Q->tail = Q->head;
     Q->free_lists = calloc(num_threads, sizeof(freelist_t));
+    for(int i = 0; i < num_threads; i++) {
+        Q->free_lists[i].head = NULL;
+        Q->free_lists[i].size = 0;
+    }
     Q->num_threads = num_threads;
     return;
 }
@@ -47,13 +51,15 @@ void destroy_queue(queue_t* Q)
 }
 
 // pull from local free list -> use in enqueue
-node_t* upcylce_node(queue_t* q, int tid) 
+node_t* upcylce_node(queue_t* Q, int tid) 
 {
-    node_t* n = q->free_lists[tid].head;
+    node_t* n = Q->free_lists[tid].head;
     if (n != NULL) {
-        q->free_lists[tid].head = n->next;
+        Q->free_lists[tid].head = n->next;
+        Q->free_lists[tid].size--;
         return n;
     }
+    Q->free_lists[tid].size--;
     return malloc(sizeof(node_t));
 }
 
@@ -62,6 +68,7 @@ void recycle_node(queue_t* Q, int tid, node_t* node)
 {
     node->next = Q->free_lists[tid].head;
     Q->free_lists[tid].head = node;
+    Q->free_lists[tid].size++;
     return;
 }
 

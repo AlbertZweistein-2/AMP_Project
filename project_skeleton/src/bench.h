@@ -23,6 +23,8 @@
     #include <Ex1.h> // Default to Ex1 if VERSION is not defined
 #endif
 
+#define DEFAULT_FILENAME "benchmark_results.csv"
+
 typedef enum {
     BATCH_SPEC_FIXED = 0,
     BATCH_SPEC_RANGE = 1,
@@ -256,7 +258,7 @@ void parse_batch_size_pattern(const char* pattern, int num_threads, batch_spec_t
 }
 
 // generate random batch size according to spec
-int batch_spec_sample(const batch_spec_t* spec, unsigned int* rng_state)
+int batch_spec_sample(const batch_spec_t* spec, unsigned int *rng_state)
 {
     if (!spec) {
         return 0;
@@ -280,10 +282,11 @@ static void parse_args(int argc, char** argv,
                        int* out_num_repetitions,
                        int* out_time_interval,
                        batch_spec_t** out_enq_specs,
-                       batch_spec_t** out_deq_specs)
+                       batch_spec_t** out_deq_specs,
+                       char** out_filename)
 {
     // 1) Validate argc
-    if(argc != 6) {
+    if(argc < 6 || argc > 7) {
         printf("Usage: %s <num_threads> <num_repetitions> <time_interval> <enq_batch_size> <deq_batch_size>\n", argv[0]);
         // Inform about enqueue/dequeue batch size patterns
         printf("Batch size patterns (entered as strings / CLI args; quote patterns in your shell):\n");
@@ -291,6 +294,7 @@ static void parse_args(int argc, char** argv,
         printf("  Random range: tuple (min,max) (e.g., \"(0,10)\")\n");
         printf("  Repeating per-thread pattern: list [x0,x1,...] (e.g., \"[5,10,(0,20)]\")\n");
         printf("  Explicit per-thread list: {x0,x1,...,xT-1} (e.g., \"{5,(0,10),10,20}\")\n");
+        printf("  Output filename (optional): if provided, results will be written to this file\n");
 
         (void) argc;
         (void) argv;
@@ -299,6 +303,7 @@ static void parse_args(int argc, char** argv,
         (void)out_time_interval;
         (void)out_enq_specs;
         (void)out_deq_specs;
+        (void)out_filename;
         return exit(EXIT_FAILURE);
     }
 
@@ -322,6 +327,14 @@ static void parse_args(int argc, char** argv,
 
     parse_batch_size_pattern(argv[4], *out_num_threads, out_enq_specs);
     parse_batch_size_pattern(argv[5], *out_num_threads, out_deq_specs);
+
+    if (out_filename) {
+        if (argc >= 7) {
+            *out_filename = argv[6];
+        } else {
+            *out_filename = (char*)DEFAULT_FILENAME;
+        }
+    }
 }
 
 // Debug: print one batch spec
