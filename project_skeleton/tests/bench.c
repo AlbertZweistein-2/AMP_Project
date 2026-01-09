@@ -62,7 +62,7 @@ void run_benchmark(int num_threads, int time_interval,
     #endif
 
     #if CHECK_CORRECTNESS
-        unsigned int total_dequeue_sum = 0;
+        uint64_t total_dequeue_sum = 0;
     #endif
 
     #pragma omp parallel num_threads(num_threads)
@@ -78,16 +78,16 @@ void run_benchmark(int num_threads, int time_interval,
         int free_list_insertions = 0;
         int max_free_list_size = 0;
         #if CHECK_CORRECTNESS
-            value_t dequeue_sum = 0;
+            uint64_t dequeue_sum = 0;
         #endif
 
         // Each thread runs the benchmark for the specified time interval
-        time_t end_time = time(NULL) + time_interval;
-        while (time(NULL) < end_time)
+        const double end_time = omp_get_wtime() + (double)time_interval;
+        while (omp_get_wtime() < end_time)
         {
             int enq_batch_size = batch_spec_sample(&enq_specs[tid], &seed);
             int deq_batch_size = batch_spec_sample(&deq_specs[tid], &seed);
-            int success;
+            unsigned int success;
 
             // Enqueue batch
             for (int i = 0; i < enq_batch_size; )
@@ -111,7 +111,7 @@ void run_benchmark(int num_threads, int time_interval,
             }
 
             // Dequeue batch
-            for (int i = 0; i < deq_batch_size; i++)
+            for (int i = 0; i < deq_batch_size; )
             {
                 success = 0;
                 value_t value;
@@ -121,12 +121,17 @@ void run_benchmark(int num_threads, int time_interval,
                 #else
                     success = deq(&value, &queue, tid);
                 #endif
+
                 max_free_list_size = queue.free_lists[tid].size > max_free_list_size ? queue.free_lists[tid].size : max_free_list_size;
                 deq_count += success;
                 failed_deq_count += (1 - success);
+
                 #if CHECK_CORRECTNESS
-                    dequeue_sum += value * success;
+                    if(success)
+                        dequeue_sum += (uint64_t)value;
                 #endif
+
+                i += success;
             }
         }
 
@@ -141,36 +146,61 @@ void run_benchmark(int num_threads, int time_interval,
         Max_free_list_size[tid] = max_free_list_size;
 
         #if CHECK_CORRECTNESS
-            #pragma omp atomic
+            #pragma omp atomic update
             total_dequeue_sum += dequeue_sum;
         #endif
     }
 
-    #if CHECK_CORRECTNESS
-        unsigned int expected_sum = 0;
+    #if CHECK_CORRECTNESS && VERSION == 5
+        uint64_t expected_sum = 0;
         for (int tid = 0; tid < num_threads; tid++)
         {
             int enq_count = Nr_enq_operations[tid];
             for (int i = 0; i < enq_count; i++)
             {
-                expected_sum += i * num_threads + tid;
+                expected_sum += (uint64_t)i * (uint64_t)num_threads + (uint64_t)tid;
             }
         }
-        node_t* curr = atomic_load(&queue.head);
-        while (curr != NULL)
+
+        value_t dv;
+        for(;;)
         {
-            value_t value = curr->value;
-            expected_sum -= value;
-            curr = atomic_load(&curr->next);
+            int ok = deq(&dv, &queue, 0, NULL, NULL);
+            if (!ok) break;
+            total_dequeue_sum += (uint64_t)dv;
         }
+
         if (total_dequeue_sum != expected_sum)
-        {
-            printf("Correctness check failed: expected sum %u, got %u\n", expected_sum, total_dequeue_sum);
-        }
+            printf("Correctness check failed: expected sum %" PRIu64 ", got %" PRIu64 "\n", 
+                expected_sum, total_dequeue_sum);
         else
+            printf("Correctness check passed: total dequeue sum matches expected sum %" PRIu64 "\n", 
+                expected_sum);
+    #elif CHECK_CORRECTNESS
+        uint64_t expected_sum = 0;
+        for (int tid = 0; tid < num_threads; tid++)
         {
-            printf("Correctness check passed: total dequeue sum matches expected sum %u\n", expected_sum);
+            int enq_count = Nr_enq_operations[tid];
+            for (int i = 0; i < enq_count; i++)
+            {
+                expected_sum += (uint64_t)i * (uint64_t)num_threads + (uint64_t)tid;
+            }
         }
+        
+        value_t dv;
+        for(;;)
+        {
+            int ok = deq(&dv, &queue, 0);
+            if (!ok) break;
+            total_dequeue_sum += (uint64_t)dv;
+        }
+
+        if (total_dequeue_sum != expected_sum)
+            printf("Correctness check failed: expected sum %" PRIu64 ", got %" PRIu64 "\n", 
+                expected_sum, total_dequeue_sum);
+        else
+            printf("Correctness check passed: total dequeue sum matches expected sum %" PRIu64 "\n", 
+                expected_sum);
     #endif
 }
 
