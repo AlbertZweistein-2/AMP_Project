@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/test_ex1_queue.dir/tests/test_ex1_queue.c.o CMakeFiles/test_ex1_queue.dir/src/Ex1.c.o -o test_ex1_queue 

@@ -111,7 +111,7 @@ void run_benchmark(int num_threads, int time_interval,
             }
 
             // Dequeue batch
-            for (int i = 0; i < deq_batch_size; )
+            for (int i = 0; i < deq_batch_size; i++)
             {
                 success = 0;
                 value_t value;
@@ -130,8 +130,6 @@ void run_benchmark(int num_threads, int time_interval,
                     if(success)
                         dequeue_sum += (uint64_t)value;
                 #endif
-
-                i += success;
             }
         }
 

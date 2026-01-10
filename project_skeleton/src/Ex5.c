@@ -212,7 +212,7 @@ int enq(value_t v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_l
     n->data = v;
     atomic_store(&n->next, NULL);
 
-    for(;;)
+    while(n)
     {
         node_t* last = atomic_load(&Q->tail);
         node_t* next = atomic_load(&last->next);

@@ -1,0 +1,142 @@
+Start testing: Jan 10 17:06 CET
+----------------------------------------------------------
+1/4 Testing: ex1_queue_test
+1/4 Test: ex1_queue_test
+Command: "/home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake/test_ex1_queue"
+Directory: /home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake
+"ex1_queue_test" start time: Jan 10 17:06 CET
+Output:
+----------------------------------------------------------
+========================================
+Running Ex1 Queue Unit Tests
+========================================
+
+Test: init_destroy
+  PASS
+Test: fifo_order
+  PASS
+Test: dequeue_empty
+  PASS
+Test: multi_thread_freelists
+  PASS
+Test: node_recycling
+  PASS
+Test: mixed_operations
+  PASS
+
+========================================
+All tests passed!
+========================================
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ex1_queue_test" end time: Jan 10 17:06 CET
+"ex1_queue_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/4 Testing: ex2_concurrent_test
+2/4 Test: ex2_concurrent_test
+Command: "/home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake/test_ex2_concurrent"
+Directory: /home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake
+"ex2_concurrent_test" start time: Jan 10 17:06 CET
+Output:
+----------------------------------------------------------
+========================================
+Running Ex2 Concurrent Queue Unit Tests
+========================================
+
+Test: init_destroy
+  PASS
+Test: fifo_order
+  PASS
+Test: dequeue_empty
+  PASS
+Test: multi_thread_freelists
+  PASS
+Test: node_recycling
+  PASS
+Test: mixed_operations
+  PASS
+Test: disjoint_intervals
+
+========================================
+All tests passed!
+========================================
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"ex2_concurrent_test" end time: Jan 10 17:06 CET
+"ex2_concurrent_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/4 Testing: ex4_twolocks_test
+3/4 Test: ex4_twolocks_test
+Command: "/home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake/test_ex4_twolocks"
+Directory: /home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake
+"ex4_twolocks_test" start time: Jan 10 17:06 CET
+Output:
+----------------------------------------------------------
+========================================
+Running Ex4 Two Locks Queue Unit Tests
+========================================
+
+Test: init_destroy
+  PASS
+Test: fifo_order
+  PASS
+Test: dequeue_empty
+  PASS
+Test: two_locks_queue
+  PASS
+
+========================================
+All tests passed!
+========================================
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ex4_twolocks_test" end time: Jan 10 17:06 CET
+"ex4_twolocks_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/4 Testing: ex5_lockfree_test
+4/4 Test: ex5_lockfree_test
+Command: "/home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake/test_ex5_lockfree"
+Directory: /home/tobiasponeschtu/Documents/AMP_Project/project_skeleton/build-cmake
+"ex5_lockfree_test" start time: Jan 10 17:06 CET
+Output:
+----------------------------------------------------------
+========================================
+Running Ex5 LockFree Queue Unit Tests
+========================================
+
+Test: init_destroy
+  PASS
+Test: fifo_order
+  PASS
+Test: dequeue_empty
+  PASS
+Test: multi_thread_freelists
+  PASS
+Test: node_recycling
+  PASS
+Test: mixed_operations
+  PASS
+Test: ABA_problem
+  PASS
+
+========================================
+All tests passed!
+========================================
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ex5_lockfree_test" end time: Jan 10 17:06 CET
+"ex5_lockfree_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 10 17:06 CET
