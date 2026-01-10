@@ -43,15 +43,6 @@ target_include_directories(benchmark_ex1 PRIVATE src)
 target_compile_definitions(benchmark_ex1 PRIVATE VERSION=1 DEBUG CORRECT_CHECK)
 target_link_libraries(benchmark_ex1 PUBLIC OpenMP::OpenMP_C)
 
-#add_custom_command(
-#     OUTPUT run_benchmark_ex1
-#     COMMAND $<TARGET_FILE:benchmark_ex1> 1 2 2 "10" "10" "benchmark_ex1_output.csv"
-#     DEPENDS benchmark_ex1
-#     COMMENT "Running benchmark_ex1 with default parameters"
-# )
-
-#add_custom_target(run_benchmark_ex1 ALL DEPENDS run_benchmark_ex1)
-
 add_executable(benchmark_ex2 tests/bench.c src/Ex2.c)
 target_include_directories(benchmark_ex2 PRIVATE src)
 target_compile_definitions(benchmark_ex2 PRIVATE VERSION=2 DEBUG CORRECT_CHECK)
