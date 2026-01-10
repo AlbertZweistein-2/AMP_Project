@@ -36,6 +36,6 @@ void destroy_queue(queue_t* Q);
 void lock_peterson(peterson_lock_t* plock, uint8_t flag_id);
 void unlock_peterson(peterson_lock_t* plock, uint8_t flag_id);
 node_t* upcylce_node(queue_t* Q, int tid);
-void recycle_node(queue_t* Q, int tid, node_t* node);
+void recycle_node(queue_t* Q, int tid, node_t* node, int* free_list_insertion_count);
 int enq(value_t v, queue_t* Q, int thread_id);
-int deq(value_t *v, queue_t* Q, int thread_id);
+int deq(value_t *v, queue_t* Q, int thread_id, int* free_list_insertion_count);

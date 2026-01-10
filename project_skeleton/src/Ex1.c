@@ -13,7 +13,8 @@ void init_queue(queue_t* Q, int num_threads)
     Q->head = make_node(0);
     Q->tail = Q->head;
     Q->free_lists = calloc(num_threads, sizeof(freelist_t));
-    for(int i = 0; i < num_threads; i++) {
+    for(int i = 0; i < num_threads; i++) 
+    {
         Q->free_lists[i].head = NULL;
         Q->free_lists[i].size = 0;
     }
@@ -26,17 +27,21 @@ void destroy_queue(queue_t* Q)
     node_t* next;
 
     /* free main queue nodes */
-    while (Q->head != NULL) {
+    while (Q->head != NULL) 
+    {
         next = Q->head->next;
         free(Q->head);
         Q->head = next;
     }
 
     /* free nodes stored in each thread-local free list */
-    if (Q->free_lists) {
-        for (int i = 0; i < Q->num_threads; ++i) {
+    if (Q->free_lists) 
+    {
+        for (int i = 0; i < Q->num_threads; ++i) 
+        {
             node_t* n = Q->free_lists[i].head;
-            while (n != NULL) {
+            while (n != NULL) 
+            {
                 node_t* tmp = n->next;
                 free(n);
                 n = tmp;
@@ -46,7 +51,6 @@ void destroy_queue(queue_t* Q)
         Q->free_lists = NULL;
         Q->num_threads = 0;
     }
-
     return;
 }
 
@@ -54,21 +58,23 @@ void destroy_queue(queue_t* Q)
 node_t* upcylce_node(queue_t* Q, int tid) 
 {
     node_t* n = Q->free_lists[tid].head;
-    if (n != NULL) {
+    if (n != NULL) 
+    {
         Q->free_lists[tid].head = n->next;
         Q->free_lists[tid].size--;
         return n;
     }
-    Q->free_lists[tid].size--;
+
     return malloc(sizeof(node_t));
 }
 
 // push in local free list -> use in dequeue
-void recycle_node(queue_t* Q, int tid, node_t* node) 
+void recycle_node(queue_t* Q, int tid, node_t* node, int* free_list_insertion_count) 
 {
     node->next = Q->free_lists[tid].head;
     Q->free_lists[tid].head = node;
     Q->free_lists[tid].size++;
+    if(free_list_insertion_count) (*free_list_insertion_count)++;
     return;
 }
 
@@ -83,15 +89,16 @@ int enq(value_t v, queue_t* Q, int thread_id)
     return 1;
 }
 
-int deq(value_t *v, queue_t* Q, int thread_id)
+int deq(value_t *v, queue_t* Q, int thread_id, int* free_list_insertion_count)
 {
     if(!Q->head->next) return 0;
     node_t* sentinel = Q->head;
     *v = sentinel->next->data;
     Q->head = sentinel->next;
-    if(Q->tail == sentinel->next){
+    
+    if(Q->tail == sentinel->next)
         Q->tail = Q->head;
-    }
-    recycle_node(Q, thread_id, sentinel);
+
+    recycle_node(Q, thread_id, sentinel, free_list_insertion_count);
     return 1;
 }

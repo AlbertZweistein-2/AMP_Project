@@ -45,10 +45,3 @@ node_t* upcylce_node(queue_t* Q, int tid);
 void recycle_node(queue_t* Q, int tid, node_t* node, int* free_list_insertion_count);
 int enq(value_t v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_list_insertion_count);
 int deq(value_t *v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_list_insertion_count);
-
-// Test helper: pauses just before attempting the head CAS in the dequeue fast-path.
-// Used to force ABA-style interleavings in unit tests.
-// `ready` is set to 1 after capturing (first,next); the caller sets `go` to 1 to resume.
-int deq_pause_before_cas(value_t* v, queue_t* Q, int thread_id,
-                         _Atomic int* ready, _Atomic int* go,
-                         node_t** observed_first, node_t** observed_next);

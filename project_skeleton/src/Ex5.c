@@ -1,16 +1,21 @@
 #include <Ex5.h>
 
-static inline int is_odd(uint64_t x) {
+static inline int is_odd(uint64_t x) 
+{
     return (int)(x & 1ULL);
 }
 
-static inline void mm_op_begin(queue_t* Q, int tid) {
+static inline void mm_op_begin(queue_t* Q, int tid) 
+{
     // even -> odd (thread is inside a queue operation)
     atomic_fetch_add_explicit(&Q->ctr[tid], 1, memory_order_seq_cst);
+    return;
 }
 
-static void mm_wait_until_unreserved(queue_t* Q, int tid) {
-    for (int t = 0; t < Q->num_threads; t++) {
+static inline void mm_wait_until_unreserved(queue_t* Q, int tid) 
+{
+    for (int t = 0; t < Q->num_threads; t++) 
+    {
         if (t == tid) continue;
 
         uint64_t v = atomic_load_explicit(&Q->ctr[t], memory_order_seq_cst);
@@ -19,44 +24,52 @@ static void mm_wait_until_unreserved(queue_t* Q, int tid) {
         if (!is_odd(v)) continue;
 
         // Odd => wait until the counter changes
-        while (atomic_load_explicit(&Q->ctr[t], memory_order_seq_cst) == v) {
-            // busy-wait
+        while (atomic_load_explicit(&Q->ctr[t], memory_order_seq_cst) == v) 
+        {// busy-wait
         }
     }
+    return;
 }
 
-static void mm_reclaim_all(queue_t* Q, int tid, int* free_list_insertion_count) {
+static inline void mm_reclaim_all(queue_t* Q, int tid, int* free_list_insertion_count) 
+{
     retired_t* r = Q->retired[tid];
     Q->retired[tid] = NULL;
     Q->retired_count[tid] = 0;
 
-    while (r) {
+    while (r != NULL) 
+    {
         retired_t* nxt = r->next;
         recycle_node(Q, tid, r->node, free_list_insertion_count);
         free(r);
         r = nxt;
     }
+    return;
 }
 
-static inline void mm_op_end(queue_t* Q, int tid, int* free_list_insertion_count) {
+static inline void mm_op_end(queue_t* Q, int tid, int* free_list_insertion_count) 
+{
     // odd -> even (thread is outside a queue operation)
     atomic_fetch_add_explicit(&Q->ctr[tid], 1, memory_order_seq_cst);
 
     // Book-style (The Art of Multiprocessor Programming, Fig. 19.8):
     // reclaim all pending retired nodes at op_end().
-    if (Q->retired_count[tid] == 0) {
+    if (Q->retired_count[tid] == 0)
         return;
-    }
+
     mm_wait_until_unreserved(Q, tid);
     mm_reclaim_all(Q, tid, free_list_insertion_count);
+    return;
 }
 
-static void mm_retire(queue_t* Q, int tid, node_t* n) {
+static inline void mm_retire(queue_t* Q, int tid, node_t* n) 
+{
     retired_t* r = malloc(sizeof(*r));
     r->node = n;
     r->next = Q->retired[tid];
     Q->retired[tid] = r;
     Q->retired_count[tid]++;
+    return;
 }
 
 node_t* make_node(value_t v)
@@ -81,7 +94,8 @@ void init_queue(queue_t* Q, int num_threads)
 
     Q->free_lists = calloc(num_threads, sizeof(freelist_t));
     //set free list sizes = 0
-    for (int i = 0; i < num_threads; i++) {
+    for (int i = 0; i < num_threads; i++) 
+    {
         Q->free_lists[i].head = NULL;
         Q->free_lists[i].size = 0;
     }
@@ -91,7 +105,8 @@ void init_queue(queue_t* Q, int num_threads)
     Q->retired = calloc(num_threads, sizeof(retired_t*));
     Q->retired_count = calloc(num_threads, sizeof(size_t));
 
-    for (int i = 0; i < num_threads; i++) {
+    for (int i = 0; i < num_threads; i++) 
+    {
         atomic_init(&Q->ctr[i], 0);
         Q->retired[i] = NULL;
         Q->retired_count[i] = 0;
@@ -102,23 +117,27 @@ void init_queue(queue_t* Q, int num_threads)
 void destroy_queue(queue_t* Q)
 {
     int nthreads = Q->num_threads;
-    node_t* next;
 
     /* free main queue nodes */
-    for (node_t* head_ptr = (node_t*)atomic_load(&Q->head); head_ptr != NULL;) {
-        next = get_next(head_ptr);
-        free(head_ptr);
-        head_ptr = next;
+    node_t* queue_head = (node_t*)atomic_load(&Q->head);
+    while (queue_head != NULL) 
+    {
+        node_t* next = get_next(queue_head);
+        free(queue_head);
+        queue_head = next;
     }
 
     /* free nodes stored in each thread-local free list */
-    if (Q->free_lists) {
-        for (int i = 0; i < nthreads; ++i) {
-            node_t* n = Q->free_lists[i].head;
-            while (n != NULL) {
-                node_t* tmp = get_next(n);
-                free(n);
-                n = tmp;
+    if (Q->free_lists) 
+    {
+        for (int i = 0; i < nthreads; i++) 
+        {
+            node_t* freelists_head = Q->free_lists[i].head;
+            while (freelists_head != NULL) 
+            {
+                node_t* next = get_next(freelists_head);
+                free(freelists_head);
+                freelists_head = next;
             }
         }
         free(Q->free_lists);
@@ -126,26 +145,31 @@ void destroy_queue(queue_t* Q)
     }
 
     /* free retired nodes (not yet reclaimed into any freelist) */
-    if (Q->retired) {
-        for (int i = 0; i < nthreads; i++) {
+    if (Q->retired) 
+    {
+        for (int i = 0; i < nthreads; i++) 
+        {
             retired_t* r = Q->retired[i];
-            while (r) {
-                retired_t* nxt = r->next;
+            while (r != NULL) 
+            {
+                retired_t* next = r->next;
                 free(r->node);
                 free(r);
-                r = nxt;
+                r = next;
             }
         }
         free(Q->retired);
         Q->retired = NULL;
     }
 
-    if (Q->ctr) {
+    if (Q->ctr) 
+    {
         free(Q->ctr);
         Q->ctr = NULL;
     }
 
-    if (Q->retired_count) {
+    if (Q->retired_count)
+    {
         free(Q->retired_count);
         Q->retired_count = NULL;
     }
@@ -158,15 +182,15 @@ void destroy_queue(queue_t* Q)
 node_t* upcylce_node(queue_t* Q, int tid) 
 {
     node_t* n = Q->free_lists[tid].head;
-    if (n != NULL) {
+    if (n != NULL) 
+    {
         Q->free_lists[tid].head = get_next(n);
         //Update size of free list
         Q->free_lists[tid].size--;
         return n;
     }
-    n = malloc(sizeof(node_t));
-    atomic_init(&n->next, NULL);
-    return n;
+
+    return make_node(0);
 }
 
 // push in local free list -> use in dequeue
@@ -193,28 +217,31 @@ int enq(value_t v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_l
         node_t* last = atomic_load(&Q->tail);
         node_t* next = atomic_load(&last->next);
 
-        if (last == atomic_load(&Q->tail)) {
-            if (next == NULL) {
+        if (last == atomic_load(&Q->tail)) 
+        {
+            if (next == NULL) 
+            {
                 node_t* expected_next = NULL;
                 if (atomic_compare_exchange_weak(&last->next, &expected_next, n)) 
                 {
-                    if(!atomic_compare_exchange_weak(&Q->tail, &last, n)){
+                    if(!atomic_compare_exchange_weak(&Q->tail, &last, n))
                         if (failed_CAS_count) (*failed_CAS_count)++;
-                    }
 
                     mm_op_end(Q, thread_id, free_list_insertion_count);
                     return 1;
                 }
-                else {
+                else 
                     if(failed_CAS_count) (*failed_CAS_count)++;
-                }
-            } else {
-                if(!atomic_compare_exchange_weak(&Q->tail, &last, next)){
+            } 
+            
+            else 
+            {
+                if(!atomic_compare_exchange_weak(&Q->tail, &last, next))
                     if(failed_CAS_count) (*failed_CAS_count)++;
-                } //Helping out the enqueuers
             }
         }
     }
+
     mm_op_end(Q, thread_id, free_list_insertion_count);
     return 0;
 }
@@ -229,74 +256,35 @@ int deq(value_t *v, queue_t* Q, int thread_id, int* failed_CAS_count, int* free_
         node_t* last = atomic_load(&Q->tail);
         node_t* next = atomic_load(&first->next);
 
-        if (first == atomic_load(&Q->head)) {
-            if (first == last) {
-                if (next == NULL) {
+        if (first == atomic_load(&Q->head)) 
+        {
+            if (first == last) 
+            {
+                if (next == NULL) 
+                {
                     mm_op_end(Q, thread_id, free_list_insertion_count);
                     return 0;
                 }
-                if(!atomic_compare_exchange_weak(&Q->tail, &last, next)) {
+                if(!atomic_compare_exchange_weak(&Q->tail, &last, next))
                     if(failed_CAS_count) (*failed_CAS_count)++;
-                } //Helping out the enqueuers
-            } else {
+            } 
+            
+            else 
+            {
                 value_t val = next->data;
-                if (atomic_compare_exchange_weak(&Q->head, &first, next)) {
+                if (atomic_compare_exchange_weak(&Q->head, &first, next)) 
+                {
                     *v = val;
                     mm_retire(Q, thread_id, first);
                     mm_op_end(Q, thread_id, free_list_insertion_count);
                     return 1;
                 }
-                else {
+                else
                     if(failed_CAS_count) (*failed_CAS_count)++;
-                }
             }
         }
     }
+
     mm_op_end(Q, thread_id, free_list_insertion_count);
-    return 0;
-}
-
-int deq_pause_before_cas(value_t* v, queue_t* Q, int thread_id,
-                         _Atomic int* ready, _Atomic int* go,
-                         node_t** observed_first, node_t** observed_next)
-{
-    mm_op_begin(Q, thread_id);
-    while (true) {
-        node_t* first = atomic_load(&Q->head);
-        node_t* last = atomic_load(&Q->tail);
-        node_t* next = atomic_load(&first->next);
-
-        if (first == atomic_load(&Q->head)) {
-            if (first == last) {
-                if (next == NULL) {
-                    mm_op_end(Q, thread_id, NULL);
-                    return 0;
-                }
-                (void)atomic_compare_exchange_weak(&Q->tail, &last, next);
-            } else {
-                value_t val = next->data;
-
-                if (ready && atomic_load_explicit(ready, memory_order_relaxed) == 0) {
-                    if (observed_first) *observed_first = first;
-                    if (observed_next) *observed_next = next;
-                    atomic_store_explicit(ready, 1, memory_order_release);
-                }
-
-                if (go) {
-                    while (atomic_load_explicit(go, memory_order_acquire) == 0) {
-                        // busy-wait
-                    }
-                }
-
-                if (atomic_compare_exchange_weak(&Q->head, &first, next)) {
-                    *v = val;
-                    mm_retire(Q, thread_id, first);
-                    mm_op_end(Q, thread_id, NULL);
-                    return 1;
-                }
-            }
-        }
-    }
-    mm_op_end(Q, thread_id, NULL);
     return 0;
 }

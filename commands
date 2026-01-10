@@ -17,7 +17,6 @@ cd project_skeleton
 docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace && mkdir -p build-cmake && cd build-cmake && cmake .. && cmake --build ."
 
 #TODO LIST:
-# add free_list_insertions tracking to benchmark in Ex1, 2, 4
 # Test mem leaks
 
 #DONE:
@@ -25,3 +24,4 @@ docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace &
 # add max_freelist_size tracking to benchmark
 # Ex5 deadlock fix in enqueue
 # check Ex4 sum differences in benchmark with concurrent queues -> Should be fixed now
+# add free_list_insertions tracking to benchmark in Ex1, 2, 4

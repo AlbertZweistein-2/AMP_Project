@@ -119,7 +119,7 @@ void run_benchmark(int num_threads, int time_interval,
                     success = deq(&value, &queue, tid, &failed_deq_CAS_count, &free_list_insertions);
                     //Check free list size
                 #else
-                    success = deq(&value, &queue, tid);
+                    success = deq(&value, &queue, tid, &free_list_insertions);
                 #endif
 
                 max_free_list_size = queue.free_lists[tid].size > max_free_list_size ? queue.free_lists[tid].size : max_free_list_size;
@@ -190,7 +190,7 @@ void run_benchmark(int num_threads, int time_interval,
         value_t dv;
         for(;;)
         {
-            int ok = deq(&dv, &queue, 0);
+            int ok = deq(&dv, &queue, 0, NULL);
             if (!ok) break;
             total_dequeue_sum += (uint64_t)dv;
         }

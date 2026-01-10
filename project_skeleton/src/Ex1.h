@@ -23,5 +23,6 @@ node_t* make_node(value_t v);
 void init_queue(queue_t* Q, int num_threads);
 void destroy_queue(queue_t* Q);
 node_t* upcylce_node(queue_t* Q, int tid);
+void recycle_node(queue_t* Q, int tid, node_t* node, int* free_list_insertion_count);
 int enq(value_t v, queue_t* Q, int thread_id);
-int deq(value_t* v, queue_t* Q, int thread_id);
+int deq(value_t* v, queue_t* Q, int thread_id, int* free_list_insertion_count);
