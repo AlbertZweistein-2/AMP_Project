@@ -6,6 +6,127 @@
 
 #include "../src/Ex5.h"
 
+// Helper function for is_odd (same as in Ex5.c)
+static inline int test_is_odd(uint64_t x) {
+    return (int)(x & 1ULL);
+}
+
+static inline void mm_op_begin(queue_t* Q, int tid) 
+{
+    // even -> odd (thread is inside a queue operation)
+    atomic_fetch_add_explicit(&Q->ctr[tid], 1, memory_order_seq_cst);
+    return;
+}
+
+static inline void mm_wait_until_unreserved(queue_t* Q, int tid) 
+{
+    for (int t = 0; t < Q->num_threads; t++) 
+    {
+        if (t == tid) continue;
+
+        uint64_t v = atomic_load_explicit(&Q->ctr[t], memory_order_seq_cst);
+
+        // Even => thread is quiescent already
+        if (!test_is_odd(v)) continue;
+
+        // Odd => wait until the counter changes
+        while (atomic_load_explicit(&Q->ctr[t], memory_order_seq_cst) == v) 
+        {// busy-wait
+        }
+    }
+    return;
+}
+
+static inline void mm_reclaim_all(queue_t* Q, int tid, int* free_list_insertion_count) 
+{
+    retired_t* r = Q->retired[tid];
+    Q->retired[tid] = NULL;
+    Q->retired_count[tid] = 0;
+
+    while (r != NULL) 
+    {
+        retired_t* nxt = r->next;
+        recycle_node(Q, tid, r->node, free_list_insertion_count);
+        free(r);
+        r = nxt;
+    }
+    return;
+}
+
+static inline void mm_op_end(queue_t* Q, int tid, int* free_list_insertion_count) 
+{
+    // odd -> even (thread is outside a queue operation)
+    atomic_fetch_add_explicit(&Q->ctr[tid], 1, memory_order_seq_cst);
+
+    // Book-style (The Art of Multiprocessor Programming, Fig. 19.8):
+    // reclaim all pending retired nodes at op_end().
+    if (Q->retired_count[tid] == 0)
+        return;
+
+    mm_wait_until_unreserved(Q, tid);
+    mm_reclaim_all(Q, tid, free_list_insertion_count);
+    return;
+}
+
+static inline void mm_retire(queue_t* Q, int tid, node_t* n) 
+{
+    retired_t* r = malloc(sizeof(*r));
+    r->node = n;
+    r->next = Q->retired[tid];
+    Q->retired[tid] = r;
+    Q->retired_count[tid]++;
+    return;
+}
+
+// Test helper: pauses just before attempting the head CAS in the dequeue fast-path.
+// Used to force ABA-style interleavings in unit tests.
+// `ready` is set to 1 after capturing (first,next); the caller sets `go` to 1 to resume.
+static inline int deq_pause_before_cas(value_t* v, queue_t* Q, int thread_id,
+                         _Atomic int* ready, _Atomic int* go,
+                         node_t** observed_first, node_t** observed_next)
+{
+    mm_op_begin(Q, thread_id);
+    while (true) {
+        node_t* first = atomic_load(&Q->head);
+        node_t* last = atomic_load(&Q->tail);
+        node_t* next = atomic_load(&first->next);
+
+        if (first == atomic_load(&Q->head)) {
+            if (first == last) {
+                if (next == NULL) {
+                    mm_op_end(Q, thread_id, NULL);
+                    return 0;
+                }
+                (void)atomic_compare_exchange_weak(&Q->tail, &last, next);
+            } else {
+                value_t val = next->data;
+
+                if (ready && atomic_load_explicit(ready, memory_order_relaxed) == 0) {
+                    if (observed_first) *observed_first = first;
+                    if (observed_next) *observed_next = next;
+                    atomic_store_explicit(ready, 1, memory_order_release);
+                }
+
+                if (go) {
+                    while (atomic_load_explicit(go, memory_order_acquire) == 0) {
+                        // busy-wait
+                    }
+                }
+
+                if (atomic_compare_exchange_weak(&Q->head, &first, next)) {
+                    *v = val;
+                    mm_retire(Q, thread_id, first);
+                    mm_op_end(Q, thread_id, NULL);
+                    return 1;
+                }
+            }
+        }
+    }
+    mm_op_end(Q, thread_id, NULL);
+    return 0;
+}
+
+
 // Helper to test initialization and basic operations
 static void test_init_destroy() {
     printf("Test: init_destroy\n");
@@ -201,11 +322,6 @@ static void test_disjoint_intervals() {
     assert(total_enqueued == total_dequeued);
     destroy_queue(&q);
     printf("  PASS\n");
-}
-
-// Helper function for is_odd (same as in Ex5.c)
-static inline int test_is_odd(uint64_t x) {
-    return (int)(x & 1ULL);
 }
 
 static void test_ABA_problem() {

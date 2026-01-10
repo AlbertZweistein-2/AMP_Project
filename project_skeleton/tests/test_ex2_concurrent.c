@@ -48,9 +48,9 @@ static void test_fifo_order() {
     
     // Dequeue and verify FIFO order
     value_t v1, v2, v3;
-    int deq1 = deq(&v1, &q, thread_id);
-    int deq2 = deq(&v2, &q, thread_id);
-    int deq3 = deq(&v3, &q, thread_id);
+    int deq1 = deq(&v1, &q, thread_id, NULL);
+    int deq2 = deq(&v2, &q, thread_id, NULL);
+    int deq3 = deq(&v3, &q, thread_id, NULL);
     
     assert(deq1 == 1 && v1 == 10);
     assert(deq2 == 1 && v2 == 20);
@@ -70,7 +70,7 @@ static void test_dequeue_empty() {
     init_queue(&q, 1);
     
     value_t v;
-    int ret = deq(&v, &q, thread_id);
+    int ret = deq(&v, &q, thread_id, NULL);
       
     // Should return 0 (fail) because only sentinel node exists
     assert(ret == 0);
@@ -90,7 +90,7 @@ static void test_multi_thread_freelists() {
     int ret1 = enq(100, &q, 0);
     value_t v1;
     node_t* ptr_temp = q.head;
-    int ret2 = deq(&v1, &q, 0);
+    int ret2 = deq(&v1, &q, 0, NULL);
     assert(ret1 == 1 && ret2 == 1 && v1 == 100);
     assert(ptr_temp == q.free_lists[0].head); // Ensure free list was used
     
@@ -98,7 +98,7 @@ static void test_multi_thread_freelists() {
     int ret3 = enq(200, &q, 1);
     node_t* ptr_temp3 = q.head;
     value_t v2;
-    int ret4 = deq(&v2, &q, 1);
+    int ret4 = deq(&v2, &q, 1, NULL);
     assert(ret3 == 1 && ret4 == 1 && v2 == 200);
     assert(ptr_temp3 == q.free_lists[1].head); // Ensure free list was used
     
@@ -106,7 +106,7 @@ static void test_multi_thread_freelists() {
     int ret5 = enq(300, &q, 2);
     node_t* ptr_temp4 = q.head;
     value_t v3;
-    int ret6 = deq(&v3, &q, 2);
+    int ret6 = deq(&v3, &q, 2, NULL);
     assert(ret5 == 1 && ret6 == 1 && v3 == 300);
     assert(ptr_temp4 == q.free_lists[2].head); // Ensure free list was used
     
@@ -126,12 +126,12 @@ static void test_node_recycling() {
     enq(111, &q, thread_0_id);
     node_t* first_ptr = q.head;
     value_t v1;
-    deq(&v1, &q, thread_0_id);  // This node should go into free_lists[0]
+    deq(&v1, &q, thread_0_id, NULL);  // This node should go into free_lists[0]
     
     enq(222, &q, thread_1_id);
     node_t* second_ptr = q.head;
     value_t v2;
-    deq(&v2, &q, thread_1_id);  // This node should go into free_lists[1]
+    deq(&v2, &q, thread_1_id, NULL);  // This node should go into free_lists[1]
 
     // Second cycle: next enqueue should reuse the freed node
     // If free list works, the node from first dequeue is reused
@@ -159,15 +159,15 @@ static void test_mixed_operations() {
     enq(2, &q, thread_id);
     
     value_t v1;
-    assert(deq(&v1, &q, thread_id) == 1 && v1 == 1);
+    assert(deq(&v1, &q, thread_id, NULL) == 1 && v1 == 1);
     
     enq(3, &q, thread_id);
     
     value_t v2;
-    assert(deq(&v2, &q, thread_id) == 1 && v2 == 2);
+    assert(deq(&v2, &q, thread_id, NULL) == 1 && v2 == 2);
     
     value_t v3;
-    assert(deq(&v3, &q, thread_id) == 1 && v3 == 3);
+    assert(deq(&v3, &q, thread_id, NULL) == 1 && v3 == 3);
     
     destroy_queue(&q);
     printf("  PASS\n");
@@ -207,7 +207,7 @@ static void test_disjoint_intervals() {
         
         // Dequeue until empty
         value_t v;
-        while (deq(&v, &q, thread_id)) {
+        while (deq(&v, &q, thread_id, NULL)) {
             local_dequeued += v;
         }
         
