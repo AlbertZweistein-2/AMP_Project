@@ -13,15 +13,15 @@
 #include <omp.h>
 
 #if VERSION == 1
-    #include <Ex1.h>
+    #include "Ex1.h"
 #elif VERSION == 2
-    #include <Ex2.h>
+    #include "Ex2.h"
 #elif VERSION == 4
-    #include <Ex4.h>
+    #include "Ex4.h"
 #elif VERSION == 5
-    #include <Ex5.h>
+    #include "Ex5.h"
 #else
-    #include <Ex1.h> // Default to Ex1 if VERSION is not defined
+    #include "Ex1.h" // Default to Ex1 if VERSION is not defined
 #endif
 
 #define DEFAULT_FILENAME "benchmark_results.csv"
