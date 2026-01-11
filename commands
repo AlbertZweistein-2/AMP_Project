@@ -18,6 +18,10 @@ docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace &
 
 #TODO LIST:
 # Test mem leaks
+# Test all tests
+# Test all benchmark_results
+# Write benchmark script like the library one
+# Write makefile, whatever they want here
 
 #DONE:
 # add result file name option to benchmark command line
