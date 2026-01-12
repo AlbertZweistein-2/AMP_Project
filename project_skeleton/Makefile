@@ -77,7 +77,7 @@ small-plot: requirements
 
 report: small-plot
 	@echo "Compiling report ..."
-	pdflatex -output-directory=$(REPORT_DIR) report/report.tex
+	pdflatex -output-directory=$(REPORT_DIR) report/smallbench-plots.tex
 
 zip:
 	@zip project.zip bench.sh small_bench.sh Makefile README src/* run_nebula.sh

@@ -167,5 +167,5 @@ Benchmark completed. Results written to data/smallbench/csv/ex5_a_p64_b1_s1_r2.c
 
 Done. Results in data/smallbench/csv
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-             32579 q_student     bash amp25w37 CG       0:52      1 nebulac
+             32582 q_student     bash amp25w37 CG       0:52      1 nebulac
 done

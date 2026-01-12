@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.7.15)  12 JAN 2026 23:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.7.15)  13 JAN 2026 00:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**report/report.tex
-(./report/report.tex
+**report/smallbench-plots.tex
+(./report/smallbench-plots.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -63,8 +63,8 @@ File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count196
 \l__pdf_internal_box=\box53
 )
-(report/report.aux)
-\openout1 = `report.aux'.
+No file smallbench-plots.aux.
+\openout1 = `smallbench-plots.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
@@ -80,7 +80,6 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
-
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count197
@@ -195,23 +194,24 @@ ine 61.
 Overfull \vbox (25.93698pt too high) has occurred while \output is active []
 
 
-[9 <report/../plots/smallbench/freelist_size.png>] (report/report.aux)
+[9 <report/../plots/smallbench/freelist_size.png>] (report/smallbench-plots.aux
+)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 3154 strings out of 476182
- 63514 string characters out of 5795595
+ 3151 strings out of 476182
+ 63547 string characters out of 5795595
  1923975 words of memory out of 5000000
- 25192 multiletter control sequences out of 15000+600000
+ 25191 multiletter control sequences out of 15000+600000
  558674 words of font info for 38 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 57i,6n,65p,211b,232s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,6n,65p,221b,232s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
-Output written on report/report.pdf (9 pages, 3313227 bytes).
+Output written on report/smallbench-plots.pdf (9 pages, 3317582 bytes).
 PDF statistics:
  63 PDF objects out of 1000 (max. 8388607)
  29 compressed objects within 1 object stream
