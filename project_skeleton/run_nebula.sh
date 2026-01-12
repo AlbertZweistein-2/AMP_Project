@@ -10,7 +10,7 @@ function copy_to_nebula {
 
 function copy_from_nebula {
     mkdir -p $DATA_DIR
-    scp -r 'nebula:~/test/uut/data/*' $DATA_DIR
+    scp -r 'nebula:~/test/amp/data/*' $DATA_DIR
 }
 
 function clean_test_dir {
@@ -20,15 +20,17 @@ function clean_test_dir {
         rm -rf *"
 }
 
+# srun -t 10 -p q_student make $TARGET
 #/usr/local/slurm/bin/srun -t 1 -p q_thesis make $TARGET
 function run_on_nebula {
     ssh nebula "\
         cd test
-        unzip -u $ZIP_FILE -d uut &&
-        cd uut &&
+        unzip -u $ZIP_FILE -d amp &&
+        cd amp &&
         make
 
-        srun -t 1 -p q_student make $TARGET
+        make $TARGET
+        
         while "'[ ! $(squeue -u $(whoami) | wc -l) = 1 ]'"; do
             squeue
             sleep 1

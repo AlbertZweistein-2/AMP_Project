@@ -288,7 +288,7 @@ static void parse_args(int argc, char** argv,
 {
     // 1) Validate argc
     if(argc < 6 || argc > 7) {
-        printf("Usage: %s <num_threads> <num_repetitions> <time_interval> <enq_batch_size> <deq_batch_size>\n", argv[0]);
+        printf("Usage: %s <num_threads> <num_repetitions> <time_interval> <enq_batch_size> <deq_batch_size> [output_filename]\n", argv[0]);
         // Inform about enqueue/dequeue batch size patterns
         printf("Batch size patterns (entered as strings / CLI args; quote patterns in your shell):\n");
         printf("  Fixed: integer value (e.g., \"10\")\n");

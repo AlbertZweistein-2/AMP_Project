@@ -1,5 +1,0 @@
-ex1_queue_test 1 0.00104212
-ex2_concurrent_test 1 0.00771374
-ex4_twolocks_test 1 0.00266972
-ex5_lockfree_test 1 0.0026096
----

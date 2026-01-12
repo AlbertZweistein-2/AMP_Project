@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/benchmark_ex1.dir/tests/bench.c.o CMakeFiles/benchmark_ex1.dir/src/Ex1.c.o -o benchmark_ex1  -Wl,-rpath,/usr/lib/llvm-18/lib /usr/lib/llvm-18/lib/libomp.so /lib/x86_64-linux-gnu/libpthread.a 

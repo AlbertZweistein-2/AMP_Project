@@ -1,269 +1,177 @@
 Archive:  project.zip
-  inflating: uut/benchmark.py        
-  inflating: uut/Makefile            
-  inflating: uut/README              
-  inflating: uut/src/library.c       
-  inflating: uut/plots/avg_plot.tex  
-  inflating: uut/report/report.tex   
-  inflating: uut/run_nebula.sh       
+  inflating: amp/bench.sh            
+  inflating: amp/small_bench.sh      
+  inflating: amp/Makefile            
+ extracting: amp/README              
+  inflating: amp/src/Ex1.c           
+  inflating: amp/src/Ex1.h           
+  inflating: amp/src/Ex2.c           
+  inflating: amp/src/Ex2.h           
+  inflating: amp/src/Ex4.c           
+  inflating: amp/src/Ex4.h           
+  inflating: amp/src/Ex4_old.c       
+  inflating: amp/src/Ex4_old.h       
+  inflating: amp/src/Ex5.c           
+  inflating: amp/src/Ex5.h           
+  inflating: amp/src/bench.c         
+  inflating: amp/src/bench.h         
+  inflating: amp/src/library.c       
+  inflating: amp/src/plots.ipynb     
+ extracting: amp/src/requirements.txt  
+  inflating: amp/src/test_ex1_queue.c  
+  inflating: amp/src/test_ex2_concurrent.c  
+  inflating: amp/src/test_ex4_twolocks.c  
+  inflating: amp/src/test_ex5_lockfree.c  
+  inflating: amp/run_nebula.sh       
 Creating build directory: build
-Compiling src/library.c
-cc -O3 -Wall -Wextra -fopenmp -fPIC -Iinc -c -o build/library.o src/library.c
-Linking library
-cc -O3 -Wall -Wextra -fopenmp -o library build/library.o
-Linking library
-cc -O3 -Wall -Wextra -fopenmp -fPIC -shared -o library.so build/library.o 
-Built library
 Creating data directory: data
-Running small-bench ...
-Thread 0 started.
-LIBRARY: lending 10 books on 1 threads took: 0.000010s
-  with 0 failed turns and 49 successful lends: 4780967.500000 lends/s throughput
-Thread 0 started.
-LIBRARY: lending 10 books on 1 threads took: 0.000003s
-  with 0 failed turns and 49 successful lends: 14386041.000000 lends/s throughput
-Thread 0 started.
-LIBRARY: lending 10 books on 1 threads took: 0.000003s
-  with 0 failed turns and 49 successful lends: 18736948.000000 lends/s throughput
-Thread 0 started.
-Thread 1 started.
-LIBRARY: lending 10 books on 2 threads took: 0.000145s
-  with 22 failed turns and 59 successful lends: 406916.312500 lends/s throughput
-Thread 1 started.
-Thread 0 started.
-LIBRARY: lending 10 books on 2 threads took: 0.000010s
-  with 0 failed turns and 58 successful lends: 5534874.500000 lends/s throughput
-Thread 1 started.
-Thread 0 started.
-LIBRARY: lending 10 books on 2 threads took: 0.000011s
-  with 0 failed turns and 58 successful lends: 5425655.000000 lends/s throughput
-Thread 1 started.
-Thread 0 started.
-Thread 2 started.
-Thread 3 started.
-LIBRARY: lending 10 books on 4 threads took: 0.000251s
-  with 8 failed turns and 78 successful lends: 310530.500000 lends/s throughput
-Thread 1 started.
-Thread 0 started.
-Thread 3 started.
-Thread 2 started.
-LIBRARY: lending 10 books on 4 threads took: 0.000047s
-  with 30 failed turns and 79 successful lends: 1673410.625000 lends/s throughput
-Thread 1 started.
-Thread 0 started.
-Thread 2 started.
-Thread 3 started.
-LIBRARY: lending 10 books on 4 threads took: 0.000063s
-  with 10 failed turns and 79 successful lends: 1246862.375000 lends/s throughput
-Thread 0 started.
-Thread 3 started.
-Thread 4 started.
-Thread 7 started.
-Thread 5 started.
-Thread 2 started.
-Thread 1 started.
-Thread 6 started.
-LIBRARY: lending 10 books on 8 threads took: 0.000464s
-  with 51 failed turns and 119 successful lends: 256613.187500 lends/s throughput
-Thread 4 started.
-Thread 5 started.
-Thread 7 started.
-Thread 0 started.
-Thread 3 started.
-Thread 6 started.
-Thread 2 started.
-Thread 1 started.
-LIBRARY: lending 10 books on 8 threads took: 0.000083s
-  with 102 failed turns and 119 successful lends: 1429137.750000 lends/s throughput
-Thread 6 started.
-Thread 2 started.
-Thread 0 started.
-Thread 3 started.
-Thread 4 started.
-Thread 1 started.
-Thread 7 started.
-Thread 5 started.
-LIBRARY: lending 10 books on 8 threads took: 0.000106s
-  with 71 failed turns and 118 successful lends: 1117329.500000 lends/s throughput
-Thread 12 started.
-Thread 11 started.
-Thread 0 started.
-Thread 14 started.
-Thread 13 started.
-Thread 7 started.
-Thread 2 started.
-Thread 6 started.
-Thread 5 started.
-Thread 3 started.
-Thread 15 started.
-Thread 10 started.
-Thread 1 started.
-Thread 4 started.
-Thread 9 started.
-Thread 8 started.
-LIBRARY: lending 10 books on 16 threads took: 0.002680s
-  with 6885 failed turns and 199 successful lends: 74265.312500 lends/s throughput
-Thread 1 started.
-Thread 7 started.
-Thread 12 started.
-Thread 5 started.
-Thread 14 started.
-Thread 0 started.
-Thread 3 started.
-Thread 2 started.
-Thread 15 started.
-Thread 11 started.
-Thread 9 started.
-Thread 13 started.
-Thread 10 started.
-Thread 8 started.
-Thread 4 started.
-Thread 6 started.
-LIBRARY: lending 10 books on 16 threads took: 0.000907s
-  with 2274 failed turns and 199 successful lends: 219473.328125 lends/s throughput
-Thread 12 started.
-Thread 14 started.
-Thread 6 started.
-Thread 1 started.
-Thread 15 started.
-Thread 7 started.
-Thread 0 started.
-Thread 2 started.
-Thread 4 started.
-Thread 9 started.
-Thread 13 started.
-Thread 5 started.
-Thread 10 started.
-Thread 3 started.
-Thread 11 started.
-Thread 8 started.
-LIBRARY: lending 10 books on 16 threads took: 0.000631s
-  with 1630 failed turns and 199 successful lends: 315269.062500 lends/s throughput
-Thread 0 started.
-LIBRARY: lending 100 books on 1 threads took: 0.000010s
-  with 0 failed turns and 139 successful lends: 14512141.000000 lends/s throughput
-Thread 0 started.
-LIBRARY: lending 100 books on 1 threads took: 0.000006s
-  with 0 failed turns and 139 successful lends: 21882576.000000 lends/s throughput
-Thread 0 started.
-LIBRARY: lenStarting Benchmark run at 2025-11-05T11:44:34
-Starting Benchmark run at 2025-11-05T11:44:34
-ding 100 books on 1 threads took: 0.000006s
-  with 0 failed turns and 139 successful lends: 24424190.000000 lends/s throughput
-Thread 0 started.
-Thread 1 started.
-LIBRARY: lending 100 books on 2 threads took: 0.000071s
-  with 0 failed turns and 239 successful lends: 3373129.250000 lends/s throughput
-Thread 0 started.
-Thread 1 started.
-LIBRARY: lending 100 books on 2 threads took: 0.000037s
-  with 14 failed turns and 238 successful lends: 6367036.500000 lends/s throughput
-Thread 0 started.
-Thread 1 started.
-LIBRARY: lending 100 books on 2 threads took: 0.000031s
-  with 5 failed turns and 238 successful lends: 7645606.000000 lends/s throughput
-Thread 0 started.
-Thread 3 started.
-Thread 2 started.
-Thread 1 started.
-LIBRARY: lending 100 books on 4 threads took: 0.001070s
-  with 170 failed turns and 439 successful lends: 410451.843750 lends/s throughput
-Thread 2 started.
-Thread 3 started.
-Thread 1 started.
-Thread 0 started.
-LIBRARY: lending 100 books on 4 threads took: 0.000223s
-  with 145 failed turns and 439 successful lends: 1971625.000000 lends/s throughput
-Thread 3 started.
-Thread 1 started.
-Thread 2 started.
-Thread 0 started.
-LIBRARY: lending 100 books on 4 threads took: 0.000265s
-  with 12 failed turns and 439 successful lends: 1657422.625000 lends/s throughput
-Thread 5 started.
-Thread 4 started.
-Thread 6 started.
-Thread 1 started.
-Thread 7 started.
-Thread 3 started.
-Thread 2 started.
-Thread 0 started.
-LIBRARY: lending 100 books on 8 threads took: 0.000766s
-  with 225 failed turns and 838 successful lends: 1094193.375000 lends/s throughput
-Thread 7 started.
-Thread 6 started.
-Thread 2 started.
-Thread 0 started.
-Thread 3 started.
-Thread 1 started.
-Thread 4 started.
-Thread 5 started.
-LIBRARY: lending 100 books on 8 threads took: 0.000516s
-  with 439 failed turns and 838 successful lends: 1623335.250000 lends/s throughput
-Thread 4 started.
-Thread 1 started.
-Thread 6 started.
-Thread 3 started.
-Thread 0 started.
-Thread 5 started.
-Thread 7 started.
-Thread 2 started.
-LIBRARY: lending 100 books on 8 threads took: 0.000737s
-  with 2856 failed turns and 839 successful lends: 1138172.000000 lends/s throughput
-Thread 0 started.
-Thread 11 started.
-Thread 12 started.
-Thread 14 started.
-Thread 13 started.
-Thread 5 started.
-Thread 1 started.
-Thread 4 started.
-Thread 2 started.
-Thread 6 started.
-Thread 15 started.
-Thread 10 started.
-Thread 7 started.
-Thread 8 started.
-Thread 9 started.
-Thread 3 started.
-LIBRARY: lending 100 books on 16 threads took: 0.003501s
-  with 6824 failed turns and 1639 successful lends: 468204.656250 lends/s throughput
-Thread 0 started.
-Thread 1 started.
-Thread 13 started.
-Thread 4 started.
-Thread 11 started.
-Thread 2 started.
-Thread 12 started.
-Thread 6 started.
-Thread 5 started.
-Thread 10 started.
-Thread 15 started.
-Thread 8 started.
-Thread 9 started.
-Thread 3 started.
-Thread 7 started.
-Thread 14 started.
-LIBRARY: lending 100 books on 16 threads took: 0.008690s
-  with 14577 failed turns and 1639 successful lends: 188606.515625 lends/s throughput
-Thread 2 started.
-Thread 6 started.
-Thread 12 started.
-Thread 7 started.
-Thread 13 started.
-Thread 3 started.
-Thread 9 started.
-Thread 8 started.
-Thread 5 started.
-Thread 11 started.
-Thread 10 started.
-Thread 1 started.
-Thread 0 started.
-Thread 15 started.
-Thread 4 started.
-Thread 14 started.
-LIBRARY: lending 100 books on 16 threads took: 0.004744s
-  with 8685 failed turns and 1639 successful lends: 345470.406250 lends/s throughput
+Creating benchmark object directory: build/bench
+Compiling src/bench.c (VERSION=1)
+cc -O3 -Wall -Wextra -fopenmp -Isrc -DVERSION=1 -c -o build/bench/bench_v1.o src/bench.c
+Compiling src/Ex1.c
+cc -O3 -Wall -Wextra -fopenmp -Isrc -c -o build/Ex1.o src/Ex1.c
+Linking build/benchmark_ex1
+cc -O3 -Wall -Wextra -fopenmp -o build/benchmark_ex1 build/bench/bench_v1.o build/Ex1.o
+Compiling src/bench.c (VERSION=2)
+cc -O3 -Wall -Wextra -fopenmp -Isrc -DVERSION=2 -c -o build/bench/bench_v2.o src/bench.c
+Compiling src/Ex2.c
+cc -O3 -Wall -Wextra -fopenmp -Isrc -c -o build/Ex2.o src/Ex2.c
+Linking build/benchmark_ex2
+cc -O3 -Wall -Wextra -fopenmp -o build/benchmark_ex2 build/bench/bench_v2.o build/Ex2.o
+Compiling src/bench.c (VERSION=4)
+cc -O3 -Wall -Wextra -fopenmp -Isrc -DVERSION=4 -c -o build/bench/bench_v4.o src/bench.c
+Compiling src/Ex4.c
+cc -O3 -Wall -Wextra -fopenmp -Isrc -c -o build/Ex4.o src/Ex4.c
+Linking build/benchmark_ex4
+cc -O3 -Wall -Wextra -fopenmp -o build/benchmark_ex4 build/bench/bench_v4.o build/Ex4.o
+Compiling src/bench.c (VERSION=5)
+cc -O3 -Wall -Wextra -fopenmp -Isrc -DVERSION=5 -c -o build/bench/bench_v5.o src/bench.c
+Compiling src/Ex5.c
+cc -O3 -Wall -Wextra -fopenmp -Isrc -c -o build/Ex5.o src/Ex5.c
+Linking build/benchmark_ex5
+cc -O3 -Wall -Wextra -fopenmp -o build/benchmark_ex5 build/bench/bench_v5.o build/Ex5.o
+Built benchmarks
+rm build/Ex4.o build/Ex1.o build/Ex5.o build/bench/bench_v2.o build/Ex2.o build/bench/bench_v4.o build/bench/bench_v1.o build/bench/bench_v5.o
+Cleaning and rebuilding with correctness checks ...
+rm -f -Rf build
+make CFLAGS="-O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS" build/benchmark_ex1 build/benchmark_ex2 build/benchmark_ex4 build/benchmark_ex5
+make[1]: Entering directory '/home/student/amp25w37/test/amp'
+Compiling src/bench.c (VERSION=1)
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -DVERSION=1 -c -o build/bench/bench_v1.o src/bench.c
+Compiling src/Ex1.c
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -c -o build/Ex1.o src/Ex1.c
+Linking build/benchmark_ex1
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -o build/benchmark_ex1 build/bench/bench_v1.o build/Ex1.o
+Compiling src/bench.c (VERSION=2)
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -DVERSION=2 -c -o build/bench/bench_v2.o src/bench.c
+Compiling src/Ex2.c
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -c -o build/Ex2.o src/Ex2.c
+Linking build/benchmark_ex2
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -o build/benchmark_ex2 build/bench/bench_v2.o build/Ex2.o
+Compiling src/bench.c (VERSION=4)
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -DVERSION=4 -c -o build/bench/bench_v4.o src/bench.c
+Compiling src/Ex4.c
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -c -o build/Ex4.o src/Ex4.c
+Linking build/benchmark_ex4
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -o build/benchmark_ex4 build/bench/bench_v4.o build/Ex4.o
+Compiling src/bench.c (VERSION=5)
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -DVERSION=5 -c -o build/bench/bench_v5.o src/bench.c
+Compiling src/Ex5.c
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -Isrc -c -o build/Ex5.o src/Ex5.c
+Linking build/benchmark_ex5
+cc -O3 -Wall -Wextra -fopenmp -DCHECK_CORRECTNESS -o build/benchmark_ex5 build/bench/bench_v5.o build/Ex5.o
+rm build/Ex4.o build/Ex1.o build/Ex5.o build/bench/bench_v2.o build/Ex2.o build/bench/bench_v4.o build/bench/bench_v1.o build/bench/bench_v5.o
+make[1]: Leaving directory '/home/student/amp25w37/test/amp'
+Running small-bench with checks ...
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 246907319792770
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 248001114638278
+Benchmark completed. Results written to data/smallbench/small_bench_ex1.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 182452156298
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 1013009202609
+Benchmark completed. Results written to data/smallbench/small_bench_ex2.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 132749742337
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 175979135575
+Benchmark completed. Results written to data/smallbench/small_bench_ex4.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 62121864063
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 50379988670
+Benchmark completed. Results written to data/smallbench/small_bench_ex5.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 6206473239726906
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 6210006772959055
+Benchmark completed. Results written to data/smallbench/small_bench_ex1.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 457020050538
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 200983706063
+Benchmark completed. Results written to data/smallbench/small_bench_ex2.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 261734249695
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 248696394929
+Benchmark completed. Results written to data/smallbench/small_bench_ex4.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 88674902450
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 72483503330
+Benchmark completed. Results written to data/smallbench/small_bench_ex5.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 5592588747120000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 6131895226629000
+Benchmark completed. Results written to data/smallbench/small_bench_ex1.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 218935864000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 480996661000
+Benchmark completed. Results written to data/smallbench/small_bench_ex2.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 152003845000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 139859447000
+Benchmark completed. Results written to data/smallbench/small_bench_ex4.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 44155854000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 32815869000
+Benchmark completed. Results written to data/smallbench/small_bench_ex5.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 155703204442981000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 153798344220693000
+Benchmark completed. Results written to data/smallbench/small_bench_ex1.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 240251813000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 219099822000
+Benchmark completed. Results written to data/smallbench/small_bench_ex2.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 279787590000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 282027620000
+Benchmark completed. Results written to data/smallbench/small_bench_ex4.csv
+Running benchmark repetition 1/2...
+Correctness check passed: total dequeue sum matches expected sum 41771855000
+Running benchmark repetition 2/2...
+Correctness check passed: total dequeue sum matches expected sum 35415866000
+Benchmark completed. Results written to data/smallbench/small_bench_ex5.csv
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
-               219 q_student     make amp25w37 CG       0:01      1 nebulac
+             30738 q_student     bash amp25w37 CG       0:50      1 nebulac
+             30747 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30746 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30745 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30744 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30743 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30742 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30740 q_student    bench amp25w48 PD       0:00      1 (Priority)
+             30739 q_student    bench amp25w48 PD       0:00      1 (Resources)
+             30619 q_student     make  amp25w3 PD       0:00      1 (PartitionTimeLimit)
 done

@@ -1,0 +1,12 @@
+Repetition,NumThreads,TimeInterval,ActualBenchTime,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize
+1,1,1,1.000000,0,22221941,22221941,0,0,0,0,22221941,1
+2,1,1,1.000000,0,22271108,22271108,0,0,0,0,22271108,1
+Repetition,NumThreads,TimeInterval,ActualBenchTime,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize
+1,1,5,5.000000,0,111413404,111413404,0,0,0,0,111413404,1
+2,1,5,5.000000,0,111445115,111445115,0,0,0,0,111445115,1
+Repetition,NumThreads,TimeInterval,ActualBenchTime,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize
+1,1,1,1.000007,0,105760000,105760000,0,0,0,0,105760000,1000
+2,1,1,1.000001,0,110742000,110742000,0,0,0,0,110742000,1000
+Repetition,NumThreads,TimeInterval,ActualBenchTime,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize
+1,1,5,5.000002,0,558038000,558038000,0,0,0,0,558038000,1000
+2,1,5,5.000005,0,554614000,554614000,0,0,0,0,554614000,1000

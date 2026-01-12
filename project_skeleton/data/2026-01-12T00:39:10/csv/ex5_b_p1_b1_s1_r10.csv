@@ -1,0 +1,11 @@
+Repetition,NumThreads,TimeInterval,ThreadID,NrEnqOps,NrDeqOps,NrFailedEnqOps,NrFailedDeqOps,NrFailedEnqCASOps,NrFailedDeqCASOps,NrFreeListInsertions,MaxFreeListSize
+1,1,1,0,11534658,0,0,0,0,0,0,0
+2,1,1,0,11630094,0,0,0,0,0,0,0
+3,1,1,0,11496119,0,0,0,0,0,0,0
+4,1,1,0,11404575,0,0,0,0,0,0,0
+5,1,1,0,11506057,0,0,0,0,0,0,0
+6,1,1,0,11505669,0,0,0,0,0,0,0
+7,1,1,0,11500642,0,0,0,0,0,0,0
+8,1,1,0,11520024,0,0,0,0,0,0,0
+9,1,1,0,11508704,0,0,0,0,0,0,0
+10,1,1,0,11507097,0,0,0,0,0,0,0

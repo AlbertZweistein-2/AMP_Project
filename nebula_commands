@@ -1,0 +1,22 @@
+### LOAD PACKAGES ###
+spack load cmake@3.26.3
+spack load openmpi@4.1.5
+spack load hpctoolkit@2022.05.15
+
+spack unload ...
+#############################
+
+### UPLOAD/DOWNLOAD (ex on local terminal) ###
+scp -r sources_alg1_v4 hydra:/home/student/hpc25s47
+scp algorithm1.cpp hydra://home/student/hpc25s47/sources_alg1_v4
+
+
+### 
+mkdir build && cd build
+
+cmake ..
+cmake --build .
+
+
+
+

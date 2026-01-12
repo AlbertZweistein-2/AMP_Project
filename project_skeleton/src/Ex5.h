@@ -5,8 +5,6 @@
 
 // NOTE: Book-style QSBR (Fig. 19.8) reclaims at every op_end(); no batching.
 // Kept for later performance experiments.
-#define RETIRE_THRESHOLD 64
-
 typedef int value_t;
 
 typedef struct node {

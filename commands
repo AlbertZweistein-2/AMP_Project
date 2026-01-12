@@ -17,11 +17,9 @@ cd project_skeleton
 docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace && mkdir -p build-cmake && cd build-cmake && cmake .. && cmake --build ."
 
 #TODO LIST:
-# Test mem leaks
-# Test all tests
-# Test all benchmark_results
-# Write benchmark script like the library one
-# Write makefile, whatever they want here
+# Check benchmark results
+# Do plots and analyze results
+# Write small-bench.sh and small-plot or whatever in python
 
 #DONE:
 # add result file name option to benchmark command line
@@ -29,3 +27,4 @@ docker run --rm -v $(pwd):/workspace amp_project:latest bash -c "cd /workspace &
 # Ex5 deadlock fix in enqueue
 # check Ex4 sum differences in benchmark with concurrent queues -> Should be fixed now
 # add free_list_insertions tracking to benchmark in Ex1, 2, 4
+# Test all tests

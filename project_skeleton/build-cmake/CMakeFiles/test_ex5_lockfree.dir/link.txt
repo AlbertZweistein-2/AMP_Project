@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/test_ex5_lockfree.dir/tests/test_ex5_lockfree.c.o CMakeFiles/test_ex5_lockfree.dir/src/Ex5.c.o -o test_ex5_lockfree  -Wl,-rpath,/usr/lib/llvm-18/lib /usr/lib/llvm-18/lib/libomp.so /lib/x86_64-linux-gnu/libpthread.a 

@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/test_ex4_twolocks.dir/tests/test_ex4_twolocks.c.o CMakeFiles/test_ex4_twolocks.dir/src/Ex4.c.o -o test_ex4_twolocks  -Wl,-rpath,/usr/lib/llvm-18/lib /usr/lib/llvm-18/lib/libomp.so /lib/x86_64-linux-gnu/libpthread.a 
