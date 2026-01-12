@@ -2,23 +2,64 @@
 
 \usepackage{graphicx}
 \usepackage{cleveref}
+\usepackage{float}
 
 \begin{document}
 
-\title{Project in Advanced Multiprocessor Programming}
-\author{Hacker Man - 12345678}
-\maketitle
+\section{Small Benchmark Plots}
 
-\section{Introduction}
-
-Here goes your report with plots as beautiful as \cref{fig:example_plot}.
-
-\begin{figure}[ht!]
+\begin{figure}[H]
   \centering
-  \includegraphics{../plots/avg_plot.pdf}
-  \caption{A sample plot showcasing the runtime of a distributed library under
-  increasing number of threads. Clearly, it does not scale very well.}
-  \label{fig:example_plot}
+  \includegraphics[width=1\linewidth]{../plots/smallbench/seq_throughput.png}
+  \caption{Sequential Throughput for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/throughput.png}
+  \caption{Throughput for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/speedup.png}
+  \caption{Speedup (Slowdown) for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/failed_ops_s.png}
+  \caption{Failed Operations for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/contention_ex5.png}
+  \caption{Contention for Example 5 in Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/failed_cas_stack.png}
+  \caption{Failed CAS Operations on Stack for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/balance_scatter.png}
+  \caption{Balance Scatter for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/thread_imbalance.png}
+  \caption{Thread Imbalance for Small Benchmark}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\linewidth]{../plots/smallbench/freelist_size.png}
+  \caption{Maximum Free List Sizes for Small Benchmark}
 \end{figure}
 
 \end{document}

@@ -94,14 +94,8 @@ void run_benchmark(int num_threads, int time_interval,
             // Enqueue batch
             for (int i = 0; i < enq_batch_size; )
             {
-                //Check time limit
                 success = 0;
-                value_t value = enq_count * num_threads + tid; // Example value to enqueue
-                // Example: num_threads = 4
-                // Thread 0 enqueues: 0, 4,  8, 12, ...
-                // Thread 1 enqueues: 1, 5,  9, 13, ...
-                // Thread 2 enqueues: 2, 6, 10, 14, ...
-                // Thread 3 enqueues: 3, 7, 11, 15, ...
+                value_t value = enq_count * num_threads + tid;
                 #if VERSION == 5
                     success += enq(value, &queue, tid, &failed_enq_CAS_count, &free_list_insertions);
                 #else
@@ -116,12 +110,10 @@ void run_benchmark(int num_threads, int time_interval,
             // Dequeue batch
             for (int i = 0; i < deq_batch_size; i++)
             {
-                //Check time limit
                 success = 0;
                 value_t value;
                 #if VERSION == 5
                     success = deq(&value, &queue, tid, &failed_deq_CAS_count, &free_list_insertions);
-                    //Check free list size
                 #else
                     success = deq(&value, &queue, tid, &free_list_insertions);
                 #endif

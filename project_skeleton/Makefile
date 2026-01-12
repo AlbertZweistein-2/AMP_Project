@@ -67,11 +67,17 @@ small-bench-check:
 	@echo "Running small-bench with checks ..."
 	@srun -t 1 -p q_student bash ./small_bench.sh
 
-small-plot:
+requirements:
+	@echo "Installing requirements ..."
+	pip3 install -r src/requirements.txt
+
+small-plot: requirements
 	@echo "Plotting small-bench results ..."
+	python3 src/plot.py data/smallbench/csv -o plots/smallbench
 
 report: small-plot
 	@echo "Compiling report ..."
+	pdflatex -output-directory=$(REPORT_DIR) report/report.tex
 
 zip:
 	@zip project.zip bench.sh small_bench.sh Makefile README src/* run_nebula.sh
