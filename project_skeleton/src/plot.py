@@ -389,7 +389,7 @@ def plot_failed_cas_stack(run_df: pd.DataFrame, out_path: Path):
             # _set_thread_axis(ax)
             ax.set_xlim(1, 64)
             ax.margins(x=0)
-            ax.set_ylim(0, 11)
+            ax.set_ylim(0, 12)
             if batch == 1:
                 ax.set_ylabel("Failed CAS per Operation (Average)")
             _safe_legend(ax, loc='upper left', fontsize='small')
