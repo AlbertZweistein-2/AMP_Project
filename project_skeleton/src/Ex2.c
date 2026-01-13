@@ -1,3 +1,6 @@
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
 #include "Ex2.h"
 
 node_t* make_node(value_t v)

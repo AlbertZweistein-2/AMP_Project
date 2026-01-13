@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+# Catherine Bley - 12002266
+# Moritz Jasper Techen - 12432927
+# Tobias Ponesch - 11818774
 import sys
 import argparse
 import re

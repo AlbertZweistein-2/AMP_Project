@@ -1,3 +1,6 @@
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
 #include "Ex5.h"
 
 static inline int is_odd(uint64_t x) 

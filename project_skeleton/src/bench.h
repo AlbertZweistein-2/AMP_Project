@@ -1,3 +1,7 @@
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
+
 #pragma once
 #include <assert.h>
 #include <ctype.h>

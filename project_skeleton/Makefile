@@ -73,10 +73,11 @@ small-bench-check:
 
 requirements:
 	@echo "Installing requirements ..."
-	pip3 install -r src/requirements.txt
+	@pip3 install -r src/requirements.txt
 
-small-plot: requirements
+small-plot:
 	@echo "Plotting small-bench results ..."
+	@echo "Python Libraries used: matplotlib, pandas, numpy"
 	python3 src/plot.py data/smallbench/csv -o plots/smallbench
 
 report: small-plot
@@ -84,10 +85,13 @@ report: small-plot
 	pdflatex -output-directory=$(REPORT_DIR) report/smallbench-plots.tex
 
 zip:
-	@zip project.zip bench.sh small_bench.sh Makefile README src/* run_nebula.sh
+	@zip project.zip bench.sh small_bench.sh Makefile src/* run_nebula.sh
+
+zip-full:
+	@zip project.zip bench.sh small_bench.sh Makefile src/* plots/benchmark-latest/* report/* run_nebula.sh CMakeLists.txt
 
 clean:
 	@echo "Cleaning build directory: $(BUILD_DIR) and benchmark binaries"
 	$(RM) -Rf $(BUILD_DIR)
 
-.PHONY: all clean report bench small-bench small-plot zip
+.PHONY: all clean report bench small-bench small-plot zip zip-full requirements plot small-bench-check

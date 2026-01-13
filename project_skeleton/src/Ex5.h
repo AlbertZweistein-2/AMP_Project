@@ -1,10 +1,12 @@
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdatomic.h>
 
 // NOTE: Book-style QSBR (Fig. 19.8) reclaims at every op_end(); no batching.
-// Kept for later performance experiments.
 typedef int value_t;
 
 typedef struct node {
@@ -28,10 +30,9 @@ typedef struct queue {
     freelist_t* free_lists;
     int num_threads;
 
-    // --- QSBR/EBR-style reclamation ---
-    _Atomic uint64_t* ctr;       // ctr[tid]: odd=in op, even=quiescent
-    retired_t** retired;         // retired[tid]: private list head
-    size_t* retired_count;       // retired_count[tid]
+    _Atomic uint64_t* ctr;
+    retired_t** retired;
+    size_t* retired_count;
 } queue_t;
 
 

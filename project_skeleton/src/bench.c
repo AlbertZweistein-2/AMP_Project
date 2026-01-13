@@ -1,37 +1,6 @@
-// Each thread must enqueue and/or dequeue a batch of nodes.
-// This shall be carried out within a given time frame (e.g., 1 second, 10 seconds)
-// Requirements:
-// - It must be possible to give the enqueue and dequeue batch sizes per thread,
-// - Batches may not all have the same size -> It should be possible to specify that batch sizes are chosen randomly,
-//   within some given range. (RANDOM GENERATOR PER THREAD! use rand_r())
-// - This should make it possible to bench different use cases, e.g.:
-//    - Some threads are enqueueing, while other threads are dequeueing only.
-//    - A good experiment will be such that over all threads the number of elements in the batches enqueued will match
-//      the number of elements in the batches dequeued.
-// - For the performance evaluation, each thread shall record the number of enqueue and dequeue operations it performend, 
-//   such that a global throughput can be computed. (THREAD LOCAL COUNTERS!)
-// - It should also count the number of failed dequeue operations
-// - The bench should also be equipped with relevant perfomance counters, like
-//    - Number of (failed) CAS operations,
-//    - Number of elements inserted into the free lists,
-//    - Maximum size of the free list,
-//    (- Maximum size of the retire list?)
-//    - Avoid shared counters! Use thread local counters and aggregate at the end of the run.
-
-// The bench must make it possible to define:
-// - The number of threads
-// - Number of repetitions of the experiment
-// - Time interval for throughput measurement
-// - Enqueue batch size (per thread or according to some pattern)
-// - Dequeue batch size (per thread or according to some pattern)
-
-// Per experiment, the output must be the actual time (average over all threads), the total number of operations, the total
-// number of enqueue and successful and failed dequeue operations per thread.
-// For correctness, it must be possible to check that all enqueued elements can actually be dequeued, once(!), and that no
-// spurious values appear in the queue: Take a large enough coniguous interval of (integer) values and allocate for each
-// thread a disjoint subinterval of values to be enqueued. Each thread coiunts how many values out of its own interval it
-// has enqueued and how many values out of any integer it has dequeued. At the end of the run, the sum over all dequeued 
-// values has to match the number of dequeued elements.
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
 
 #include "../src/bench.h"
 

@@ -1,3 +1,6 @@
+// Catherine Bley - 12002266
+// Moritz Jasper Techen - 12432927
+// Tobias Ponesch - 11818774
 #include "Ex4.h"
 
 node_t* make_node(value_t v)
@@ -132,6 +135,8 @@ int deq(value_t *v, queue_t* Q, int thread_id, int* free_list_insertion_count)
         omp_unset_lock(&Q->enq_lock);
     }
 
+    // This recycle should be moved after releasing deq_lock to reduce contention
+    // Was not changed due to time constraints of rerunning the bench
     recycle_node(Q, thread_id, sentinel, free_list_insertion_count);
 
     omp_unset_lock(&Q->deq_lock);
