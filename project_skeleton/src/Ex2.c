@@ -56,7 +56,7 @@ void destroy_queue(queue_t* Q)
 }
 
 // pull from local free list -> use in enqueue
-node_t* upcylce_node(queue_t* Q, int tid) 
+node_t* upcycle_node(queue_t* Q, int tid) 
 {
     node_t* n = Q->free_lists[tid].head;
     if (n != NULL) 
@@ -83,7 +83,7 @@ int enq(value_t v, queue_t* Q, int thread_id)
 {
     //Locking to ensure thread safety during enqueue
     omp_set_lock(&Q->lock);
-    node_t* new_node = upcylce_node(Q, thread_id);
+    node_t* new_node = upcycle_node(Q, thread_id);
     if(!new_node)
     {
         omp_unset_lock(&Q->lock);
@@ -113,7 +113,7 @@ int deq(value_t *v, queue_t* Q, int thread_id, int* free_list_insertion_count)
     {
         Q->tail = Q->head;
     }
-    recycle_node(Q, thread_id, sentinel, free_list_insertion_count);
     omp_unset_lock(&Q->lock);
+    recycle_node(Q, thread_id, sentinel, free_list_insertion_count);
     return 1;
 }

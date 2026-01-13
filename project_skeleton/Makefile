@@ -54,6 +54,10 @@ bench: $(BENCH_BINS)
 	@echo "Running big benchmark via ./bench.sh"
 	@bash ./bench.sh
 
+plot:
+	@echo "Plotting benchmark results via src/plot.py"
+	python3 src/plot.py data/2026-01-13T13:54:12/csv -o plots/benchmark-latest
+
 small-bench: $(BENCH_BINS) $(DATA_DIR)
 	@echo "Running small-bench ..."
 	@srun -t 1 -p q_student bash ./small_bench.sh

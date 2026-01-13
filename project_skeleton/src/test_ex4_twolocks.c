@@ -296,12 +296,12 @@ int main(void) {
     test_init_destroy();
     test_fifo_order();
     test_dequeue_empty();
-    //test_multi_thread_freelists();
-    //test_node_recycling();
-    //test_mixed_operations();
+    test_multi_thread_freelists();
+    test_node_recycling();
+    test_mixed_operations();
 
     // Added actual concurent queue test
-    //test_disjoint_intervals();
+    test_disjoint_intervals();
 
     test_two_locks();
     

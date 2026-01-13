@@ -247,7 +247,7 @@ def plot_throughput(run_df: pd.DataFrame, out_path: Path):
             ax.grid(True, which="both", ls="-", alpha=0.3)
             ax.set_xlabel("Number of Threads")
             _set_thread_axis(ax)
-            ax.set_ylim(4e4, 4e8) 
+            ax.set_ylim(7e3, 3e8) 
             if batch == 1:
                 ax.set_ylabel("Average Throughput (ops/s)")
             _safe_legend(ax, title="Exercise", loc='upper right', fontsize='x-small')
