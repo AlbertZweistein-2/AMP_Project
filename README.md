@@ -144,3 +144,10 @@ This project shows that **concurrent data structures are not automatically faste
 - **Two locks**: best throughput in most concurrent scenarios
 - **Lock-free**: best fairness and progress distribution
 - **Sequential**: fastest overall when concurrency is not required
+
+## Tech Stack
+- C
+- OpenMP
+- C11 atomics
+- CSV-based benchmarking
+- Linux / cluster benchmarking on nebula
